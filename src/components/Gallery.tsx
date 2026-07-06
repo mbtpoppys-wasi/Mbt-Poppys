@@ -1,10 +1,21 @@
 import Image from "next/image";
 import { getGalleryImages, getGalleryImageUrl } from "@/lib/data";
+import { LOCAL_GALLERY_PHOTOS } from "@/lib/local-gallery";
 
 export default async function Gallery() {
-  const images = await getGalleryImages();
+  const dbImages = await getGalleryImages();
 
-  if (images.length === 0) return null;
+  const photos = [
+    ...LOCAL_GALLERY_PHOTOS,
+    ...dbImages.map((image) => ({
+      id: image.id,
+      src: getGalleryImageUrl(image.filename),
+      alt: image.alt_text,
+      caption: image.caption,
+    })),
+  ];
+
+  if (photos.length === 0) return null;
 
   return (
     <section id="gallery" className="bg-charcoal py-20">
@@ -20,22 +31,22 @@ export default async function Gallery() {
 
         {/* Mobile: horizontal scroll-snap carousel. Desktop: grid. */}
         <div className="mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto scrollbar-none pb-4 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3">
-          {images.map((image, index) => (
+          {photos.map((photo, index) => (
             <figure
-              key={image.id}
+              key={photo.id}
               className="relative aspect-[4/3] w-[85vw] flex-shrink-0 snap-center overflow-hidden rounded-2xl border border-white/10 sm:w-auto sm:flex-shrink"
             >
               <Image
-                src={getGalleryImageUrl(image.filename)}
-                alt={image.alt_text}
+                src={photo.src}
+                alt={photo.alt}
                 fill
                 loading={index < 2 ? "eager" : "lazy"}
                 sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 33vw"
                 className="object-cover"
               />
-              {image.caption && (
+              {photo.caption && (
                 <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 py-3 text-sm text-white">
-                  {image.caption}
+                  {photo.caption}
                 </figcaption>
               )}
             </figure>
