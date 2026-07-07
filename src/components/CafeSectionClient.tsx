@@ -3,10 +3,10 @@
 import { useState } from "react";
 import type { CafeCategory, CafeProduct } from "@/lib/types";
 
-const TABS: { key: CafeCategory; label: string }[] = [
-  { key: "fresh_bakery", label: "Fresh Bakery" },
-  { key: "cold_drinks", label: "Cold Drinks" },
-  { key: "travel_snacks", label: "Travel Snacks" },
+const TABS: { key: CafeCategory; label: string; icon: string }[] = [
+  { key: "fresh_bakery", label: "Fresh Bakery", icon: "☕" },
+  { key: "cold_drinks", label: "Cold Drinks", icon: "🥤" },
+  { key: "travel_snacks", label: "Travel Snacks", icon: "🍬" },
 ];
 
 export default function CafeSectionClient({ products }: { products: CafeProduct[] }) {
@@ -24,12 +24,13 @@ export default function CafeSectionClient({ products }: { products: CafeProduct[
             key={tab.key}
             type="button"
             onClick={() => setActive(tab.key)}
-            className={`rounded-xl px-5 py-2.5 font-display text-xs font-bold uppercase tracking-wide transition ${
+            className={`flex items-center gap-2 rounded-xl px-5 py-2.5 font-display text-xs font-bold uppercase tracking-wide transition ${
               active === tab.key
                 ? "-translate-y-0.5 bg-mbtYellow text-mbtDark shadow-lg shadow-black/10"
                 : "border border-gray-300 bg-white text-mbtDark/60 hover:border-mbtYellow/60 hover:text-mbtDark"
             }`}
           >
+            <span className="text-base">{tab.icon}</span>
             {tab.label}
           </button>
         ))}

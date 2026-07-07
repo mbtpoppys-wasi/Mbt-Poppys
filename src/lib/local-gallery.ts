@@ -8,6 +8,7 @@ export interface LocalGalleryPhoto {
   src: string;
   alt: string;
   caption: string;
+  subtitle?: string;
 }
 
 export const LOCAL_GALLERY_PHOTOS: LocalGalleryPhoto[] = [
@@ -15,13 +16,15 @@ export const LOCAL_GALLERY_PHOTOS: LocalGalleryPhoto[] = [
     id: "local-canopy-daytime",
     src: "/images/mbt-poppys-ventersdorp-fuel-station-canopy-daytime.jpg",
     alt: "MBT Poppys Ventersdorp fuel station canopy and forecourt on a clear day",
-    caption: "Our forecourt on Carmichael Street, Ventersdorp",
+    caption: "Premium Canopy Hub",
+    subtitle: "Safe, well-lit fueling lanes 24/7",
   },
   {
     id: "local-pylon-night",
     src: "/images/mbt-poppys-ventersdorp-led-pylon-sign-night.webp",
     alt: "MBT Poppys Ventersdorp illuminated LED pylon sign at night showing diesel price and BUZZ Café",
-    caption: "Lit up and open all night",
+    caption: "Iconic LED Pylon",
+    subtitle: "Visible pricing from the highway",
   },
   {
     id: "local-forecourt-night",

@@ -4,9 +4,9 @@ import type { CafeProduct, FuelPrice, GalleryImage, StatusBanner } from "@/lib/t
 // Fallback data lets the site render before Supabase env vars / tables exist
 // (first `npm run dev` right after cloning), rather than crashing the page.
 const FALLBACK_FUEL_PRICES: FuelPrice[] = [
-  { id: "fallback-95", fuel_type: "petrol_95", price: 22.99, updated_at: new Date().toISOString() },
-  { id: "fallback-93", fuel_type: "petrol_93", price: 22.79, updated_at: new Date().toISOString() },
-  { id: "fallback-diesel", fuel_type: "diesel_50ppm", price: 20.49, updated_at: new Date().toISOString() },
+  { id: "fallback-95", fuel_type: "petrol_95", price: 26.1, updated_at: new Date().toISOString() },
+  { id: "fallback-93", fuel_type: "petrol_93", price: 25.94, updated_at: new Date().toISOString() },
+  { id: "fallback-diesel", fuel_type: "diesel_50ppm", price: 24.78, updated_at: new Date().toISOString() },
 ];
 
 export async function getFuelPrices(): Promise<FuelPrice[]> {

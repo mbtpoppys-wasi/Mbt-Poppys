@@ -17,8 +17,8 @@ export default function HomePage() {
       <StatusBanner />
       <Hero />
       <FuelPricesSection />
-      <CafeSection />
       <Gallery />
+      <CafeSection />
       <ServicesSection />
       <Reviews />
       <LocationSection />

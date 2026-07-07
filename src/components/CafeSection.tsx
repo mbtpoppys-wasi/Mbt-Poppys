@@ -5,20 +5,21 @@ export default async function CafeSection() {
   const products = await getCafeProducts();
 
   return (
-    <section id="buzz-cafe" className="bg-mbtGray py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-display text-3xl font-black uppercase tracking-wide text-mbtDark sm:text-4xl">
+    <section id="buzz-cafe" className="bg-mbtGray px-4 py-24 text-mbtDark">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-12 border-b border-gray-300 pb-8 text-center">
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-800">
+            <span className="text-sm">🐝</span> 24/7 Roadside Convenience
+          </span>
+          <h2 className="font-display text-3xl font-black uppercase tracking-tight text-mbtDark sm:text-4xl lg:text-5xl">
             BUZZ <span className="text-mbtYellow drop-shadow-[0_1px_0_rgba(0,0,0,0.15)]">Café</span>
           </h2>
-          <p className="mt-3 text-mbtDark/60">
+          <p className="mx-auto mt-3 max-w-md text-mbtDark/60">
             Fresh bakery, ice-cold drinks, and travel snacks — available around the clock.
           </p>
         </div>
 
-        <div className="mt-12">
-          <CafeSectionClient products={products} />
-        </div>
+        <CafeSectionClient products={products} />
       </div>
     </section>
   );

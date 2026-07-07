@@ -24,12 +24,18 @@ export default function OpenNowIndicator() {
 
   return (
     <div
-      className={`inline-block rounded-lg px-5 py-2.5 font-display text-xs font-bold uppercase tracking-widest shadow-led-glow ${
-        open === false ? "bg-red-500/90 text-white" : "bg-mbtYellow text-mbtDark"
+      className={`inline-flex items-center gap-2 rounded px-4 py-2 font-display text-xs font-black uppercase tracking-[0.25em] shadow-xl sm:text-sm ${
+        open === false ? "bg-red-500/90 text-white" : "animate-pulse bg-mbtYellow text-mbtDark"
       }`}
       role="status"
       aria-live="polite"
     >
+      {open !== false && (
+        <span className="relative flex h-2.5 w-2.5">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mbtDark opacity-75" />
+          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-mbtDark" />
+        </span>
+      )}
       {label}
     </div>
   );

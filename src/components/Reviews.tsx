@@ -2,10 +2,10 @@ import { getPlaceRating } from "@/lib/google-places";
 import { siteConfig } from "@/lib/site-config";
 
 const HIGHLIGHTS = [
-  "Praised for fast, friendly attendants who help day or night.",
-  "Regularly described as the most reliable fill-up stop in Ventersdorp.",
-  "Customers highlight the BUZZ Café bakery as a favourite quick stop.",
-  "Known for a clean forecourt and well-stocked convenience store.",
+  "Attendants are consistently praised as fast, friendly, and quick to assist as soon as a car pulls in.",
+  "Long-time customers say they won't fill up anywhere else in Ventersdorp.",
+  "Noted for serving customers comfortably in their home language.",
+  "Recommended repeatedly by local Google Guides for reliable, helpful service.",
 ];
 
 export default async function Reviews() {
