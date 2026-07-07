@@ -26,14 +26,14 @@ export default function StatusBannerClient({
   if (dismissed) return null;
 
   return (
-    <div className="relative z-30 flex items-center justify-center gap-3 bg-mbt-yellow px-4 py-2.5 text-center text-sm font-semibold text-charcoal">
-      <span className="inline-flex h-2 w-2 flex-shrink-0 animate-pulse-slow rounded-full bg-charcoal" />
+    <div className="relative z-30 flex items-center justify-center gap-3 bg-mbtYellow px-4 py-2.5 text-center text-sm font-semibold text-mbtDark">
+      <span className="inline-flex h-2 w-2 flex-shrink-0 animate-pulse-slow rounded-full bg-mbtDark" />
       <p className="font-body">{message}</p>
       <button
         type="button"
         onClick={handleDismiss}
         aria-label="Dismiss notice"
-        className="ml-2 flex-shrink-0 rounded-full px-2 text-charcoal/70 transition hover:text-charcoal"
+        className="ml-2 flex-shrink-0 rounded-full px-2 text-mbtDark/70 transition hover:text-mbtDark"
       >
         ✕
       </button>

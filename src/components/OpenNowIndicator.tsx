@@ -24,21 +24,21 @@ export default function OpenNowIndicator() {
 
   return (
     <div
-      className="inline-flex items-center gap-2 rounded-full border border-mbt-yellow/40 bg-black/40 px-4 py-2 backdrop-blur-sm"
+      className="inline-flex items-center gap-2 rounded-full border border-mbtYellow/40 bg-black/40 px-4 py-2 backdrop-blur-sm"
       role="status"
       aria-live="polite"
     >
       <span className="relative flex h-2.5 w-2.5">
         {open && (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mbt-yellow opacity-75" />
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mbtYellow opacity-75" />
         )}
         <span
           className={`relative inline-flex h-2.5 w-2.5 rounded-full ${
-            open === null ? "bg-gray-400" : open ? "bg-mbt-yellow" : "bg-red-500"
+            open === null ? "bg-gray-400" : open ? "bg-mbtYellow" : "bg-red-500"
           }`}
         />
       </span>
-      <span className="font-display text-xs font-bold uppercase tracking-widest text-mbt-yellow">
+      <span className="font-display text-xs font-bold uppercase tracking-widest text-mbtYellow">
         {label}
       </span>
     </div>

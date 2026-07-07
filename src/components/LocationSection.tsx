@@ -4,11 +4,11 @@ export default function LocationSection() {
   const { address, phoneDisplay, phoneE164 } = siteConfig;
 
   return (
-    <section id="location" className="bg-charcoal py-20">
+    <section id="location" className="bg-mbtDark py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-display text-3xl font-bold uppercase tracking-wide text-white sm:text-4xl">
-            Find Us
+          <h2 className="font-display text-3xl font-black uppercase tracking-wide text-white sm:text-4xl">
+            Find <span className="text-mbtYellow">Us</span>
           </h2>
           <p className="mt-3 text-white/60">
             Open 24 hours at 13 Carmichael Street, Ventersdorp — pull in any time, day or night.
@@ -30,7 +30,7 @@ export default function LocationSection() {
               </p>
               <a
                 href={`tel:${phoneE164}`}
-                className="mt-4 inline-block text-lg font-semibold text-mbt-yellow hover:underline"
+                className="mt-4 inline-block text-lg font-semibold text-mbtYellow hover:underline"
               >
                 {phoneDisplay}
               </a>
@@ -40,7 +40,7 @@ export default function LocationSection() {
               href={siteConfig.googleMapsDirectionsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-block rounded-full bg-mbt-yellow px-8 py-3 text-center font-display text-sm font-bold uppercase tracking-wide text-charcoal shadow-led-glow transition hover:brightness-95"
+              className="mt-6 inline-block rounded-full bg-mbtYellow px-8 py-3 text-center font-display text-sm font-bold uppercase tracking-wide text-mbtDark shadow-led-glow transition hover:brightness-95"
             >
               Get Directions
             </a>

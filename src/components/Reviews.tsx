@@ -14,11 +14,11 @@ export default async function Reviews() {
   const placeId = process.env.GOOGLE_PLACES_PLACE_ID;
 
   return (
-    <section id="reviews" className="bg-charcoal-light py-20">
+    <section id="reviews" className="bg-mbtDark py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-display text-3xl font-bold uppercase tracking-wide text-white sm:text-4xl">
-            What Our Customers Say
+          <h2 className="font-display text-3xl font-black uppercase tracking-wide text-white sm:text-4xl">
+            What Our <span className="text-mbtYellow">Customers Say</span>
           </h2>
           <p className="mt-3 text-white/60">
             Real, live reviews from Google — unedited, and updated automatically.
@@ -29,10 +29,10 @@ export default async function Reviews() {
           {rating ? (
             <>
               <div className="flex items-center gap-2">
-                <span className="font-display text-4xl font-bold text-mbt-yellow">
+                <span className="font-display text-4xl font-bold text-mbtYellow">
                   {rating.rating.toFixed(1)}
                 </span>
-                <div aria-hidden className="flex text-mbt-yellow">
+                <div aria-hidden className="flex text-mbtYellow">
                   {"★★★★★".slice(0, Math.round(rating.rating))}
                   <span className="text-white/20">
                     {"★★★★★".slice(Math.round(rating.rating))}
@@ -53,7 +53,7 @@ export default async function Reviews() {
             href={siteConfig.googleWriteAReviewUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 rounded-full bg-mbt-yellow px-6 py-2.5 font-display text-xs font-bold uppercase tracking-wide text-charcoal shadow-led-glow transition hover:brightness-95"
+            className="mt-4 rounded-full bg-mbtYellow px-6 py-2.5 font-display text-xs font-bold uppercase tracking-wide text-mbtDark shadow-led-glow transition hover:brightness-95"
           >
             Leave Us A Review
           </a>
@@ -63,7 +63,7 @@ export default async function Reviews() {
           {HIGHLIGHTS.map((text) => (
             <div
               key={text}
-              className="rounded-xl border border-white/10 bg-charcoal-card px-5 py-4 text-sm text-white/70"
+              className="rounded-xl border border-white/10 bg-mbtCard px-5 py-4 text-sm text-white/70"
             >
               {text}
             </div>

@@ -18,11 +18,11 @@ export default async function Gallery() {
   if (photos.length === 0) return null;
 
   return (
-    <section id="gallery" className="bg-charcoal py-20">
+    <section id="gallery" className="bg-mbtDark py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-display text-3xl font-bold uppercase tracking-wide text-white sm:text-4xl">
-            Around The Station
+          <h2 className="font-display text-3xl font-black uppercase tracking-wide text-white sm:text-4xl">
+            Around The <span className="text-mbtYellow">Station</span>
           </h2>
           <p className="mt-3 text-white/60">
             A look at the forecourt, canopy, and BUZZ Café in Ventersdorp.
@@ -34,7 +34,7 @@ export default async function Gallery() {
           {photos.map((photo, index) => (
             <figure
               key={photo.id}
-              className="relative aspect-[4/3] w-[85vw] flex-shrink-0 snap-center overflow-hidden rounded-2xl border border-white/10 sm:w-auto sm:flex-shrink"
+              className="group relative aspect-[4/3] w-[85vw] flex-shrink-0 snap-center overflow-hidden rounded-2xl border border-white/10 sm:w-auto sm:flex-shrink"
             >
               <Image
                 src={photo.src}
@@ -42,10 +42,10 @@ export default async function Gallery() {
                 fill
                 loading={index < 2 ? "eager" : "lazy"}
                 sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 33vw"
-                className="object-cover"
+                className="object-cover transition duration-500 group-hover:scale-105"
               />
               {photo.caption && (
-                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 py-3 text-sm text-white">
+                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent px-4 py-4 text-sm text-white opacity-100 transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100">
                   {photo.caption}
                 </figcaption>
               )}

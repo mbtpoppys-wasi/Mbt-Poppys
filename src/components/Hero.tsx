@@ -13,14 +13,14 @@ export default function Hero() {
         sizes="100vw"
         className="object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/70 to-charcoal/20" />
-      <div className="absolute inset-0 bg-gradient-to-r from-charcoal/60 via-transparent to-charcoal/60" />
+      <div className="absolute inset-0 bg-gradient-to-t from-mbtDark via-mbtDark/70 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-mbtDark/60 via-transparent to-mbtDark/60" />
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 pt-32 sm:px-6 sm:pb-24 lg:px-8">
         <OpenNowIndicator />
 
-        <h1 className="mt-6 max-w-3xl font-display text-4xl font-extrabold uppercase leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-          MBT Poppys <span className="text-mbt-yellow text-shadow-led">Ventersdorp</span>
+        <h1 className="mt-6 max-w-3xl font-display text-4xl font-black uppercase leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
+          Poppys <span className="text-mbtYellow text-shadow-led">Ventersdorp</span>
         </h1>
 
         <p className="mt-4 max-w-xl text-base text-white/80 sm:text-lg">
@@ -32,15 +32,15 @@ export default function Hero() {
         <div className="mt-8 flex flex-col gap-4 sm:flex-row">
           <Link
             href="#fuel-prices"
-            className="rounded-full bg-mbt-yellow px-8 py-3 text-center font-display text-sm font-bold uppercase tracking-wide text-charcoal shadow-led-glow transition hover:brightness-95"
+            className="rounded-full bg-mbtYellow px-8 py-3 text-center font-display text-sm font-bold uppercase tracking-wide text-mbtDark shadow-led-glow transition hover:brightness-95"
           >
-            See Fuel Prices
+            Check Pump Prices
           </Link>
           <Link
-            href="#location"
-            className="rounded-full border border-white/30 bg-black/30 px-8 py-3 text-center font-display text-sm font-bold uppercase tracking-wide text-white backdrop-blur-sm transition hover:border-mbt-yellow/60 hover:text-mbt-yellow"
+            href="#buzz-cafe"
+            className="rounded-full border border-white/30 bg-black/30 px-8 py-3 text-center font-display text-sm font-bold uppercase tracking-wide text-white backdrop-blur-sm transition hover:border-mbtYellow/60 hover:text-mbtYellow"
           >
-            Get Directions
+            Explore BUZZ Café
           </Link>
         </div>
       </div>

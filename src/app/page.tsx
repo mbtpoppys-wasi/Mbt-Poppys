@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import StatusBanner from "@/components/StatusBanner";
 import FuelPricesSection from "@/components/FuelPricesSection";
@@ -12,6 +13,7 @@ import Footer from "@/components/Footer";
 export default function HomePage() {
   return (
     <>
+      <Header />
       <StatusBanner />
       <Hero />
       <FuelPricesSection />
