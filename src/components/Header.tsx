@@ -18,9 +18,9 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <Link href="#" className="group flex items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded bg-mbtYellow text-mbtDark transition duration-300 group-hover:rotate-6">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
-            </svg>
+            <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-mbtDark font-display text-[11px] font-black leading-none">
+              M
+            </span>
           </span>
           <div className="leading-tight">
             <p className="font-display text-lg font-black uppercase tracking-tighter text-mbtYellow sm:text-2xl">
