@@ -192,29 +192,3 @@ export async function deleteGalleryImageAction(_prevState: ActionResult, formDat
   revalidatePath("/admin");
   return { success: true, message: "Photo removed." };
 }
-
-export async function submitNotificationSignupAction(
-  _prevState: ActionResult,
-  formData: FormData
-): Promise<ActionResult> {
-  const name = String(formData.get("name") ?? "").trim();
-  const phone = String(formData.get("phone") ?? "").trim();
-
-  if (!name || !phone) {
-    return { success: false, message: "Please enter your name and phone number." };
-  }
-  if (phone.replace(/[^0-9+]/g, "").length < 9) {
-    return { success: false, message: "Please enter a valid phone number." };
-  }
-
-  const supabase = createServiceRoleClient();
-  const { error } = await supabase.from("notification_signups").insert({
-    name,
-    phone,
-    consented_at: new Date().toISOString(),
-  });
-
-  if (error) return { success: false, message: "Something went wrong. Please try again." };
-
-  return { success: true, message: "You're on the list — we'll notify you when prices drop." };
-}

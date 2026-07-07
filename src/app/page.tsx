@@ -9,7 +9,6 @@ import Gallery from "@/components/Gallery";
 import Reviews from "@/components/Reviews";
 import LocationSection from "@/components/LocationSection";
 import ServicesSection from "@/components/ServicesSection";
-import NotificationSection from "@/components/NotificationSection";
 import Footer from "@/components/Footer";
 
 export default function HomePage() {
@@ -72,7 +71,6 @@ export default function HomePage() {
         tint="bg-mbtCard"
       />
 
-      <NotificationSection />
       <Gallery />
       <Footer />
     </>
