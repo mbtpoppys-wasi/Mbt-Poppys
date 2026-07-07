@@ -26,8 +26,8 @@ export default function CafeSectionClient({ products }: { products: CafeProduct[
             onClick={() => setActive(tab.key)}
             className={`flex items-center gap-2 rounded-xl px-5 py-2.5 font-display text-xs font-bold uppercase tracking-wide transition ${
               active === tab.key
-                ? "-translate-y-0.5 bg-mbtYellow text-mbtDark shadow-lg shadow-black/10"
-                : "border border-gray-300 bg-white text-mbtDark/60 hover:border-mbtYellow/60 hover:text-mbtDark"
+                ? "-translate-y-0.5 bg-mbtYellow text-mbtDark shadow-lg shadow-black/30"
+                : "border border-white/15 bg-mbtCard text-white/60 hover:border-mbtYellow/60 hover:text-white"
             }`}
           >
             <span className="text-base">{tab.icon}</span>
@@ -38,7 +38,7 @@ export default function CafeSectionClient({ products }: { products: CafeProduct[
 
       <div key={active} className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.length === 0 && (
-          <p className="col-span-full text-center text-mbtDark/40">
+          <p className="col-span-full text-center text-white/40">
             New items coming soon to this category.
           </p>
         )}
@@ -46,18 +46,18 @@ export default function CafeSectionClient({ products }: { products: CafeProduct[
           <div
             key={product.id}
             style={{ animationDelay: `${index * 70}ms` }}
-            className="animate-fade-slide-up rounded-2xl border border-black/5 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+            className="animate-fade-slide-up rounded-2xl border border-white/10 bg-mbtCard p-6 transition hover:-translate-y-1 hover:border-mbtYellow/30"
           >
-            <h3 className="font-display text-lg font-bold text-mbtDark">{product.name}</h3>
+            <h3 className="font-display text-lg font-bold text-white">{product.name}</h3>
             {product.description && (
-              <p className="mt-2 text-sm text-mbtDark/60">{product.description}</p>
+              <p className="mt-2 text-sm text-white/60">{product.description}</p>
             )}
             <div className="mt-4 flex items-center gap-2">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500 opacity-75" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-500" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-400" />
               </span>
-              <span className="font-display text-[10px] font-bold uppercase tracking-wide text-amber-600">
+              <span className="font-display text-[10px] font-bold uppercase tracking-wide text-amber-400">
                 Available 24/7
               </span>
             </div>
