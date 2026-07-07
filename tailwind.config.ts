@@ -48,12 +48,17 @@ const config: Config = {
           "0%": { transform: "scale(1)" },
           "100%": { transform: "scale(1.08)" },
         },
+        fadeIn: {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
       },
       animation: {
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "glow-pulse": "glowPulse 2.4s ease-in-out infinite",
         "fade-slide-up": "fadeSlideUp 0.4s ease-out both",
         "subtle-zoom": "subtleZoom 20s ease-in-out infinite alternate",
+        "fade-in": "fadeIn 0.2s ease-out both",
       },
     },
   },

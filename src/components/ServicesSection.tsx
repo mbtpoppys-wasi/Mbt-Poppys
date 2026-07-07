@@ -1,3 +1,5 @@
+import Reveal from "@/components/Reveal";
+
 const SERVICES = [
   {
     title: "Spares & Tyres",
@@ -26,20 +28,21 @@ export default function ServicesSection() {
   return (
     <section id="services" className="border-t border-white/10 bg-[#0a0a0a] px-4 py-24 text-white">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-16 text-center">
+        <Reveal className="mb-16 text-center">
           <h2 className="font-display text-3xl font-black uppercase tracking-wide text-white sm:text-4xl">
             Station <span className="text-mbtYellow">Services</span>
           </h2>
           <p className="mt-3 text-xs font-bold uppercase tracking-[0.2em] text-mbtYellow">
             More than just fuel — your complete Ventersdorp pitstop
           </p>
-        </div>
+        </Reveal>
 
         <div className="grid grid-cols-1 gap-6 text-left sm:grid-cols-3 sm:gap-8">
-          {SERVICES.map((service) => (
-            <div
+          {SERVICES.map((service, index) => (
+            <Reveal
               key={service.title}
-              className={`group relative overflow-hidden rounded-2xl border p-8 transition duration-300 ${
+              delay={index * 100}
+              className={`group relative overflow-hidden rounded-2xl border p-8 transition duration-300 hover:-translate-y-1 ${
                 service.featured
                   ? "border-2 border-mbtYellow/40 bg-gradient-to-br from-mbtCard to-[#1a1a1a]"
                   : "border-white/10 bg-mbtCard hover:border-mbtYellow/50"
@@ -67,7 +70,7 @@ export default function ServicesSection() {
               <p className="relative z-10 mt-3 text-sm leading-relaxed text-white/60">
                 {service.description}
               </p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

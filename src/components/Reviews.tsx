@@ -1,6 +1,7 @@
 import { getPlaceRating } from "@/lib/google-places";
 import { siteConfig } from "@/lib/site-config";
 import { REVIEWS } from "@/lib/reviews-data";
+import Reveal from "@/components/Reveal";
 
 export default async function Reviews() {
   const rating = await getPlaceRating();
@@ -60,10 +61,11 @@ export default async function Reviews() {
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {REVIEWS.map((review) => (
-            <div
+          {REVIEWS.map((review, index) => (
+            <Reveal
               key={review.name}
-              className="flex flex-col justify-between rounded-2xl border border-white/10 bg-mbtCard p-6"
+              delay={index * 80}
+              className="flex flex-col justify-between rounded-2xl border border-white/10 bg-mbtCard p-6 transition duration-300 hover:-translate-y-1 hover:border-mbtYellow/30"
             >
               <div>
                 <div aria-hidden className="mb-3 text-mbtYellow">
@@ -75,7 +77,7 @@ export default async function Reviews() {
                 <p className="text-sm font-semibold text-white">{review.name}</p>
                 <p className="text-xs text-white/40">{review.credential}</p>
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
 

@@ -1,5 +1,6 @@
 import { getFuelPrices } from "@/lib/data";
 import FuelPriceCard from "@/components/FuelPriceCard";
+import Reveal from "@/components/Reveal";
 
 export default async function FuelPricesSection() {
   const prices = await getFuelPrices();
@@ -35,12 +36,10 @@ export default async function FuelPricesSection() {
         </p>
 
         <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3 lg:gap-8">
-          {sorted.map((fuel) => (
-            <FuelPriceCard
-              key={fuel.id}
-              fuel={fuel}
-              featured={fuel.fuel_type === "diesel_50ppm"}
-            />
+          {sorted.map((fuel, index) => (
+            <Reveal key={fuel.id} delay={index * 100}>
+              <FuelPriceCard fuel={fuel} featured={fuel.fuel_type === "diesel_50ppm"} />
+            </Reveal>
           ))}
         </div>
 
