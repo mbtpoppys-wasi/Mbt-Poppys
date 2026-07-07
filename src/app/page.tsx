@@ -30,9 +30,11 @@ export default function HomePage() {
         tint="bg-mbtDark"
       />
 
+      <CafeSection />
+
       <NightShowcase />
 
-      <CafeSection />
+      <ServicesSection />
 
       <ImageFeatureRow
         src="/images/buzz-cafe-ventersdorp-convenience-store-interior.webp"
@@ -45,7 +47,7 @@ export default function HomePage() {
         tint="bg-mbtCard"
       />
 
-      <ServicesSection />
+      <Reviews />
 
       <ImageFeatureRow
         src="/images/buzz-cafe-ventersdorp-storefront-night.webp"
@@ -57,7 +59,7 @@ export default function HomePage() {
         tint="bg-mbtDark"
       />
 
-      <Reviews />
+      <LocationSection />
 
       <ImageFeatureRow
         src="/images/buzz-cafe-ventersdorp-snack-shelves-interior.webp"
@@ -70,9 +72,8 @@ export default function HomePage() {
         tint="bg-mbtCard"
       />
 
-      <Gallery />
-      <LocationSection />
       <NotificationSection />
+      <Gallery />
       <Footer />
     </>
   );
