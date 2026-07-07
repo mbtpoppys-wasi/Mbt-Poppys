@@ -1,29 +1,5 @@
 import Reveal from "@/components/Reveal";
 
-const SERVICES = [
-  {
-    title: "Spares & Tyres",
-    description:
-      "Puncture repairs, tyre fitment, and essential spares kept in stock for drivers passing through Ventersdorp.",
-    icon: "🚗",
-    featured: false,
-  },
-  {
-    title: "Drive-Thru Deli",
-    description:
-      "Quick, no-queue deli service for hot food and drinks without leaving your vehicle.",
-    icon: "🍗",
-    featured: false,
-  },
-  {
-    title: "24-Hour Desk",
-    description:
-      "A manned desk around the clock for fuel, airtime, and anything else you need on the road.",
-    icon: "🏪",
-    featured: true,
-  },
-];
-
 export default function ServicesSection() {
   return (
     <section id="services" className="border-t border-white/10 bg-[#0a0a0a] px-4 py-24 text-white">
@@ -37,42 +13,19 @@ export default function ServicesSection() {
           </p>
         </Reveal>
 
-        <div className="grid grid-cols-1 gap-6 text-left sm:grid-cols-3 sm:gap-8">
-          {SERVICES.map((service, index) => (
-            <Reveal
-              key={service.title}
-              delay={index * 100}
-              className={`group relative overflow-hidden rounded-2xl border p-8 transition duration-300 hover:-translate-y-1 ${
-                service.featured
-                  ? "border-2 border-mbtYellow/40 bg-gradient-to-br from-mbtCard to-[#1a1a1a]"
-                  : "border-white/10 bg-mbtCard hover:border-mbtYellow/50"
-              }`}
-            >
-              {service.featured && (
-                <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 rounded-bl-full bg-mbtYellow/5 transition duration-500 group-hover:bg-mbtYellow/10" />
-              )}
-              <div
-                className={`mb-6 flex h-14 w-14 items-center justify-center rounded-xl text-3xl shadow-lg transition duration-300 group-hover:scale-110 ${
-                  service.featured
-                    ? "bg-mbtYellow text-mbtDark shadow-[0_0_15px_rgba(255,222,0,0.4)]"
-                    : "border border-white/10 bg-[#1a1a1a]"
-                }`}
-              >
-                {service.icon}
-              </div>
-              <h3
-                className={`font-display text-xl font-bold ${
-                  service.featured ? "text-white drop-shadow-md" : "text-mbtYellow"
-                }`}
-              >
-                {service.title}
-              </h3>
-              <p className="relative z-10 mt-3 text-sm leading-relaxed text-white/60">
-                {service.description}
-              </p>
-            </Reveal>
-          ))}
-        </div>
+        <Reveal className="group relative mx-auto max-w-md overflow-hidden rounded-2xl border-2 border-mbtYellow/40 bg-gradient-to-br from-mbtCard to-[#1a1a1a] p-8 text-left transition duration-300 hover:-translate-y-1">
+          <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 rounded-bl-full bg-mbtYellow/5 transition duration-500 group-hover:bg-mbtYellow/10" />
+          <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-mbtYellow text-3xl text-mbtDark shadow-[0_0_15px_rgba(255,222,0,0.4)] transition duration-300 group-hover:scale-110">
+            🏪
+          </div>
+          <h3 className="font-display text-xl font-bold text-white drop-shadow-md">
+            24-Hour Desk
+          </h3>
+          <p className="relative z-10 mt-3 text-sm leading-relaxed text-white/60">
+            A manned desk around the clock for fuel, airtime, and anything else you need on the
+            road.
+          </p>
+        </Reveal>
       </div>
     </section>
   );

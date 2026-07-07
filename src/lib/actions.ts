@@ -36,7 +36,7 @@ export async function updateFuelPriceAction(_prevState: ActionResult, formData: 
   const priceRaw = String(formData.get("price") ?? "");
   const price = Number(priceRaw);
 
-  if (!["petrol_95", "petrol_93", "diesel_50ppm"].includes(fuelType)) {
+  if (!["petrol_95", "petrol_93", "diesel_50ppm", "diesel_10ppm"].includes(fuelType)) {
     return { success: false, message: "Invalid fuel type." };
   }
   if (!Number.isFinite(price) || price <= 0) {
@@ -84,7 +84,11 @@ export async function addCafeProductAction(_prevState: ActionResult, formData: F
   const description = String(formData.get("description") ?? "").trim();
   const sortOrder = Number(formData.get("sort_order") ?? 0);
 
-  if (!["fresh_bakery", "cold_drinks", "travel_snacks"].includes(category)) {
+  if (
+    !["fresh_bakery", "cold_drinks", "travel_snacks", "tobacco_vapes", "braai_outdoor", "essentials"].includes(
+      category
+    )
+  ) {
     return { success: false, message: "Invalid category." };
   }
   if (!name) return { success: false, message: "Product name is required." };
@@ -191,4 +195,62 @@ export async function deleteGalleryImageAction(_prevState: ActionResult, formDat
   revalidatePath("/");
   revalidatePath("/admin");
   return { success: true, message: "Photo removed." };
+}
+
+export async function addSpecialAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdmin();
+
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const sortOrder = Number(formData.get("sort_order") ?? 0);
+
+  if (!title) return { success: false, message: "Title is required." };
+
+  const supabase = createServiceRoleClient();
+  const { error } = await supabase.from("specials").insert({
+    title,
+    description,
+    sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
+  });
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/specials");
+  revalidatePath("/admin");
+  return { success: true, message: "Special added." };
+}
+
+export async function toggleSpecialAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdmin();
+
+  const id = String(formData.get("id") ?? "");
+  const isActive = formData.get("is_active") === "true";
+  if (!id) return { success: false, message: "Missing special id." };
+
+  const supabase = createServiceRoleClient();
+  const { error } = await supabase
+    .from("specials")
+    .update({ is_active: !isActive, updated_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/specials");
+  revalidatePath("/admin");
+  return { success: true, message: "Special updated." };
+}
+
+export async function deleteSpecialAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdmin();
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) return { success: false, message: "Missing special id." };
+
+  const supabase = createServiceRoleClient();
+  const { error } = await supabase.from("specials").delete().eq("id", id);
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/specials");
+  revalidatePath("/admin");
+  return { success: true, message: "Special removed." };
 }

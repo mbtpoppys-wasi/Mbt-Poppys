@@ -4,6 +4,7 @@ const LABELS: Record<FuelPrice["fuel_type"], { kind: string; name: string }> = {
   petrol_95: { kind: "Unleaded", name: "Petrol 95" },
   petrol_93: { kind: "Unleaded", name: "Petrol 93" },
   diesel_50ppm: { kind: "Diesel", name: "50ppm" },
+  diesel_10ppm: { kind: "Diesel", name: "10ppm" },
 };
 
 export default function FuelPriceCard({
@@ -19,7 +20,7 @@ export default function FuelPriceCard({
     <div
       className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-mbtNear px-6 py-8 text-left transition duration-300 ${
         featured
-          ? "border-2 border-mbtYellow shadow-[0_10px_40px_rgba(255,222,0,0.15)] sm:-translate-y-4"
+          ? "border-2 border-mbtYellow shadow-[0_10px_40px_rgba(255,222,0,0.15)] lg:-translate-y-4"
           : "border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)] hover:border-white/30"
       }`}
     >

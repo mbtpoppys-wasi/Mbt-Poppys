@@ -4,7 +4,12 @@ import Reveal from "@/components/Reveal";
 
 export default async function FuelPricesSection() {
   const prices = await getFuelPrices();
-  const order: Record<string, number> = { petrol_95: 0, petrol_93: 1, diesel_50ppm: 2 };
+  const order: Record<string, number> = {
+    petrol_95: 0,
+    petrol_93: 1,
+    diesel_50ppm: 2,
+    diesel_10ppm: 3,
+  };
   const sorted = [...prices].sort((a, b) => order[a.fuel_type] - order[b.fuel_type]);
 
   const latestUpdate = prices.reduce<Date | null>((latest, fuel) => {
@@ -32,13 +37,13 @@ export default async function FuelPricesSection() {
           Live Fuel <span className="text-mbtYellow">Prices</span>
         </h2>
         <p className="mx-auto mb-16 max-w-xl text-sm font-medium text-white/50 sm:text-base">
-          Real-time pump pricing at MBT Poppys Ventersdorp, 13 Carmichael Street, Ventersdorp.
+          Real-time pump pricing at MBT Poppys Ventersdorp, 38 Hendrik Potgieter Street, Ventersdorp.
         </p>
 
-        <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3 lg:gap-8">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
           {sorted.map((fuel, index) => (
             <Reveal key={fuel.id} delay={index * 100}>
-              <FuelPriceCard fuel={fuel} featured={fuel.fuel_type === "diesel_50ppm"} />
+              <FuelPriceCard fuel={fuel} featured={fuel.fuel_type === "diesel_10ppm"} />
             </Reveal>
           ))}
         </div>

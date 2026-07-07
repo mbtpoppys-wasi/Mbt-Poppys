@@ -7,7 +7,7 @@ export default function NightShowcase() {
     <section className="relative flex h-[65vh] min-h-[480px] w-full items-center overflow-hidden border-b border-white/10">
       <Image
         src="/images/mbt-poppys-ventersdorp-forecourt-night.webp"
-        alt="MBT Poppys Ventersdorp forecourt and fuel pumps lit up at night, 13 Carmichael Street Ventersdorp"
+        alt="MBT Poppys Ventersdorp forecourt and fuel pumps lit up at night, 38 Hendrik Potgieter Street Ventersdorp"
         fill
         loading="lazy"
         sizes="100vw"

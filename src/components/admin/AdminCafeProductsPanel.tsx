@@ -14,6 +14,9 @@ const CATEGORY_LABELS: Record<CafeProduct["category"], string> = {
   fresh_bakery: "Fresh Bakery",
   cold_drinks: "Cold Drinks",
   travel_snacks: "Travel Snacks",
+  tobacco_vapes: "Tobacco & Vapes",
+  braai_outdoor: "Braai & Outdoor",
+  essentials: "Essentials",
 };
 
 function AddSubmitButton() {
@@ -69,6 +72,9 @@ export default function AdminCafeProductsPanel({ products }: { products: CafePro
           <option value="fresh_bakery">Fresh Bakery</option>
           <option value="cold_drinks">Cold Drinks</option>
           <option value="travel_snacks">Travel Snacks</option>
+          <option value="tobacco_vapes">Tobacco & Vapes</option>
+          <option value="braai_outdoor">Braai & Outdoor</option>
+          <option value="essentials">Essentials</option>
         </select>
         <input
           type="number"

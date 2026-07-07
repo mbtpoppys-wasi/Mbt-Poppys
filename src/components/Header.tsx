@@ -5,9 +5,10 @@ import Link from "next/link";
 import { siteConfig } from "@/lib/site-config";
 
 const NAV_LINKS = [
-  { href: "#fuel-prices", label: "Live Pump Prices" },
-  { href: "#buzz-cafe", label: "BUZZ Café" },
-  { href: "#services", label: "Our Services" },
+  { href: "/#fuel-prices", label: "Live Pump Prices" },
+  { href: "/#buzz-cafe", label: "BUZZ Café" },
+  { href: "/#services", label: "Our Services" },
+  { href: "/specials", label: "Specials" },
 ];
 
 export default function Header() {
@@ -16,7 +17,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-mbtDark/95 shadow-2xl shadow-black/50 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <Link href="#" className="group flex items-center gap-3">
+        <Link href="/" className="group flex items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded bg-mbtYellow text-mbtDark transition duration-300 group-hover:rotate-6">
             <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-mbtDark font-display text-[11px] font-black leading-none">
               M

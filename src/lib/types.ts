@@ -1,4 +1,4 @@
-export type FuelType = "petrol_95" | "petrol_93" | "diesel_50ppm";
+export type FuelType = "petrol_95" | "petrol_93" | "diesel_50ppm" | "diesel_10ppm";
 
 export interface FuelPrice {
   id: string;
@@ -7,7 +7,13 @@ export interface FuelPrice {
   updated_at: string;
 }
 
-export type CafeCategory = "fresh_bakery" | "cold_drinks" | "travel_snacks";
+export type CafeCategory =
+  | "fresh_bakery"
+  | "cold_drinks"
+  | "travel_snacks"
+  | "tobacco_vapes"
+  | "braai_outdoor"
+  | "essentials";
 
 export interface CafeProduct {
   id: string;
@@ -29,5 +35,15 @@ export interface StatusBanner {
   id: string;
   is_active: boolean;
   message: string;
+  updated_at: string;
+}
+
+export interface Special {
+  id: string;
+  title: string;
+  description: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
   updated_at: string;
 }

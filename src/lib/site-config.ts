@@ -7,37 +7,38 @@ export const siteConfig = {
   businessName: "MBT Poppys Ventersdorp",
   legalName: "MBT Poppys Ventersdorp Fuel Station & BUZZ Café",
   shortDescription:
-    "24-hour fuel station and BUZZ Café convenience store on Carmichael Street, Ventersdorp.",
+    "24-hour fuel station and BUZZ Café convenience store on Hendrik Potgieter Street, Ventersdorp.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://mbtpoppysventersdorp.vercel.app",
 
   address: {
-    streetAddress: "13 Carmichael Street",
+    streetAddress: "38 Hendrik Potgieter Street",
     addressLocality: "Ventersdorp",
     addressRegion: "North West",
     postalCode: "2710",
     addressCountry: "ZA",
   },
 
-  // TODO: replace with the exact pin coordinates from Google Business Profile / Google Maps.
+  // TODO: this still reflects the old address — replace with the exact pin
+  // coordinates for 38 Hendrik Potgieter Street from Google Business Profile.
+  // (The map embed/directions links below use the address text directly, so
+  // those are already accurate; only this JSON-LD geo pin needs updating.)
   geo: {
     latitude: -26.8825,
     longitude: 26.8158,
   },
 
-  // TODO: replace with the exact number as listed on Google Business Profile (same formatting).
-  phoneDisplay: "018 264 0000",
-  phoneE164: "+27182640000",
+  phoneDisplay: "018 264 2913",
+  phoneE164: "+27182642913",
 
   priceRange: "R",
 
   googleMapsEmbedSrc:
-    "https://www.google.com/maps?q=13+Carmichael+Street,+Ventersdorp,+2710,+South+Africa&output=embed",
+    "https://www.google.com/maps?q=38+Hendrik+Potgieter+Street,+Ventersdorp,+2710,+South+Africa&output=embed",
   googleMapsDirectionsUrl:
-    "https://www.google.com/maps/dir/?api=1&destination=13+Carmichael+Street,+Ventersdorp,+2710,+South+Africa",
+    "https://www.google.com/maps/dir/?api=1&destination=38+Hendrik+Potgieter+Street,+Ventersdorp,+2710,+South+Africa",
 
-  // TODO: replace with the real Google Business Profile place/review links once claimed.
-  googleReviewUrl: "https://search.google.com/local/writereview?placeid=REPLACE_WITH_PLACE_ID",
-  googleWriteAReviewUrl: "https://g.page/r/REPLACE_WITH_GBP_CODE/review",
+  googleReviewUrl: "https://g.page/r/CScuA4VrSljeEBM/review",
+  googleWriteAReviewUrl: "https://g.page/r/CScuA4VrSljeEBM/review",
 };
 
 export type SiteConfig = typeof siteConfig;

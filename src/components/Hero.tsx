@@ -7,7 +7,7 @@ export default function Hero() {
     <section className="relative flex h-[85vh] min-h-[600px] w-full items-center justify-center overflow-hidden">
       <Image
         src="/images/hero-canopy.jpg"
-        alt="MBT Poppys Ventersdorp fuel station canopy lit up at night, 13 Carmichael Street Ventersdorp"
+        alt="MBT Poppys Ventersdorp fuel station canopy lit up at night, 38 Hendrik Potgieter Street Ventersdorp"
         fill
         priority
         sizes="100vw"
@@ -19,12 +19,12 @@ export default function Hero() {
         <OpenNowIndicator />
 
         <h1 className="mx-auto mb-6 mt-6 font-display text-4xl font-black uppercase leading-none tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.85)] sm:text-6xl md:text-7xl lg:text-8xl">
-          Poppys <span className="text-mbtYellow text-shadow-led">Ventersdorp</span>
+          Poppys Motors <span className="text-mbtYellow text-shadow-led">Ventersdorp</span>
         </h1>
 
         <p className="mx-auto mb-10 max-w-2xl text-sm font-medium leading-relaxed text-gray-200 drop-shadow-md sm:text-lg md:text-xl">
           Premium fueling lanes, clean amenities, and the fully stocked BUZZ Café.
-          Conveniently located on Carmichael Street, South Africa.
+          Conveniently located on Hendrik Potgieter Street, South Africa.
         </p>
 
         <div className="mx-auto flex max-w-md flex-col items-center justify-center gap-4 sm:flex-row">

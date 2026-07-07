@@ -7,6 +7,9 @@ const TABS: { key: CafeCategory; label: string; icon: string }[] = [
   { key: "fresh_bakery", label: "Fresh Bakery", icon: "☕" },
   { key: "cold_drinks", label: "Cold Drinks", icon: "🥤" },
   { key: "travel_snacks", label: "Travel Snacks", icon: "🍬" },
+  { key: "tobacco_vapes", label: "Tobacco & Vapes", icon: "🚬" },
+  { key: "braai_outdoor", label: "Braai & Outdoor", icon: "🔥" },
+  { key: "essentials", label: "Essentials", icon: "🏧" },
 ];
 
 export default function CafeSectionClient({ products }: { products: CafeProduct[] }) {

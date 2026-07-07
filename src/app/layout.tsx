@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s | MBT Poppys Ventersdorp",
   },
   description:
-    "MBT Poppys Ventersdorp is a 24 hour filling station and garage in Ventersdorp offering petrol 95, petrol 93, and 50ppm diesel, plus the BUZZ Café convenience store, drive-thru deli, and tyre & spares desk at 13 Carmichael Street. Your reliable petrol station near me stop in Ventersdorp, day or night.",
+    "MBT Poppys Ventersdorp is a 24 hour filling station and garage in Ventersdorp offering petrol 95, petrol 93, and 50ppm diesel, plus the BUZZ Café convenience store, drive-thru deli, and tyre & spares desk at 38 Hendrik Potgieter Street. Your reliable petrol station near me stop in Ventersdorp, day or night.",
   keywords: [
     "fuel station Ventersdorp",
     "garage Ventersdorp",
@@ -46,13 +46,13 @@ export const metadata: Metadata = {
     siteName: siteConfig.businessName,
     title: "MBT Poppys Ventersdorp | 24 Hour Fuel Station & Filling Station Ventersdorp",
     description:
-      "24-hour fuel station and BUZZ Café convenience store at 13 Carmichael Street, Ventersdorp. Petrol 95, Petrol 93, and 50ppm diesel — open around the clock.",
+      "24-hour fuel station and BUZZ Café convenience store at 38 Hendrik Potgieter Street, Ventersdorp. Petrol 95, Petrol 93, and 50ppm diesel — open around the clock.",
     images: [
       {
         url: "/images/hero-canopy.jpg",
         width: 1200,
         height: 630,
-        alt: "MBT Poppys Ventersdorp fuel station canopy at night, 13 Carmichael Street Ventersdorp",
+        alt: "MBT Poppys Ventersdorp fuel station canopy at night, 38 Hendrik Potgieter Street Ventersdorp",
       },
     ],
   },
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "MBT Poppys Ventersdorp | 24 Hour Fuel Station Ventersdorp",
     description:
-      "24-hour fuel station and BUZZ Café convenience store at 13 Carmichael Street, Ventersdorp.",
+      "24-hour fuel station and BUZZ Café convenience store at 38 Hendrik Potgieter Street, Ventersdorp.",
     images: ["/images/hero-canopy.jpg"],
   },
   robots: {

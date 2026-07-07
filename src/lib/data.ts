@@ -1,12 +1,13 @@
 import { createServerClient } from "@/lib/supabase/server";
-import type { CafeProduct, FuelPrice, GalleryImage, StatusBanner } from "@/lib/types";
+import type { CafeProduct, FuelPrice, GalleryImage, Special, StatusBanner } from "@/lib/types";
 
 // Fallback data lets the site render before Supabase env vars / tables exist
 // (first `npm run dev` right after cloning), rather than crashing the page.
 const FALLBACK_FUEL_PRICES: FuelPrice[] = [
-  { id: "fallback-95", fuel_type: "petrol_95", price: 26.1, updated_at: new Date().toISOString() },
-  { id: "fallback-93", fuel_type: "petrol_93", price: 25.94, updated_at: new Date().toISOString() },
-  { id: "fallback-diesel", fuel_type: "diesel_50ppm", price: 24.78, updated_at: new Date().toISOString() },
+  { id: "fallback-95", fuel_type: "petrol_95", price: 26.31, updated_at: new Date().toISOString() },
+  { id: "fallback-93", fuel_type: "petrol_93", price: 26.15, updated_at: new Date().toISOString() },
+  { id: "fallback-diesel-50", fuel_type: "diesel_50ppm", price: 27.74, updated_at: new Date().toISOString() },
+  { id: "fallback-diesel-10", fuel_type: "diesel_10ppm", price: 28.74, updated_at: new Date().toISOString() },
 ];
 
 export async function getFuelPrices(): Promise<FuelPrice[]> {
@@ -59,6 +60,37 @@ export function getGalleryImageUrl(filename: string): string {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!url) return "";
   return `${url}/storage/v1/object/public/station-photos/${filename}`;
+}
+
+export async function getActiveSpecials(): Promise<Special[]> {
+  try {
+    const supabase = createServerClient();
+    const { data, error } = await supabase
+      .from("specials")
+      .select("*")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+
+    if (error || !data) return [];
+    return data as Special[];
+  } catch {
+    return [];
+  }
+}
+
+export async function getAllSpecials(): Promise<Special[]> {
+  try {
+    const supabase = createServerClient();
+    const { data, error } = await supabase
+      .from("specials")
+      .select("*")
+      .order("sort_order", { ascending: true });
+
+    if (error || !data) return [];
+    return data as Special[];
+  } catch {
+    return [];
+  }
 }
 
 export async function getStatusBanner(): Promise<StatusBanner | null> {

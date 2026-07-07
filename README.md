@@ -1,7 +1,7 @@
 # MBT Poppys Ventersdorp
 
 Next.js 14 (App Router) + Tailwind CSS site for **MBT Poppys Ventersdorp**, a 24-hour
-fuel station and BUZZ Café convenience store at 13 Carmichael Street, Ventersdorp,
+fuel station and BUZZ Café convenience store at 38 Hendrik Potgieter Street, Ventersdorp,
 South Africa.
 
 - **Framework:** Next.js 14 (App Router, TypeScript)
@@ -189,7 +189,7 @@ Inconsistent NAP is a real, measurable local-SEO ranking penalty. Before launch:
 2. Update `googleMapsDirectionsUrl`, `googleReviewUrl`, and `googleWriteAReviewUrl`
    once you have your Google Business Profile's real place ID / short link.
 3. Cross-check the address formatting (abbreviations, punctuation, suite numbers)
-   matches GBP exactly — "13 Carmichael Street" vs "13 Carmichael St" counts as a
+   matches GBP exactly — "38 Hendrik Potgieter Street" vs "38 Hendrik Potgieter St" counts as a
    mismatch to some directories.
 
 ---

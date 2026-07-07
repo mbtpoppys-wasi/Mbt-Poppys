@@ -10,6 +10,7 @@ const LABELS: Record<FuelPrice["fuel_type"], string> = {
   petrol_95: "Petrol 95",
   petrol_93: "Petrol 93",
   diesel_50ppm: "Diesel 50ppm",
+  diesel_10ppm: "Diesel 10ppm",
 };
 
 function SubmitButton() {

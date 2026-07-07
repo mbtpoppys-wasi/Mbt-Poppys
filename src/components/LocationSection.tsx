@@ -11,7 +11,7 @@ export default function LocationSection() {
             Find <span className="text-mbtYellow">Us</span>
           </h2>
           <p className="mt-3 text-white/60">
-            Open 24 hours at 13 Carmichael Street, Ventersdorp — pull in any time, day or night.
+            Open 24 hours at 38 Hendrik Potgieter Street, Ventersdorp — pull in any time, day or night.
           </p>
         </div>
 
