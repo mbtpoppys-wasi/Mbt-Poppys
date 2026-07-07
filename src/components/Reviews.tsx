@@ -1,12 +1,6 @@
 import { getPlaceRating } from "@/lib/google-places";
 import { siteConfig } from "@/lib/site-config";
-
-const HIGHLIGHTS = [
-  "Attendants are consistently praised as fast, friendly, and quick to assist as soon as a car pulls in.",
-  "Long-time customers say they won't fill up anywhere else in Ventersdorp.",
-  "Noted for serving customers comfortably in their home language.",
-  "Recommended repeatedly by local Google Guides for reliable, helpful service.",
-];
+import { REVIEWS } from "@/lib/reviews-data";
 
 export default async function Reviews() {
   const rating = await getPlaceRating();
@@ -59,13 +53,28 @@ export default async function Reviews() {
           </a>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {HIGHLIGHTS.map((text) => (
+        <div className="mt-4 text-center">
+          <span className="inline-block rounded-full border border-mbtYellow/30 bg-mbtYellow/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-mbtYellow">
+            Reviews
+          </span>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {REVIEWS.map((review) => (
             <div
-              key={text}
-              className="rounded-xl border border-white/10 bg-mbtCard px-5 py-4 text-sm text-white/70"
+              key={review.name}
+              className="flex flex-col justify-between rounded-2xl border border-white/10 bg-mbtCard p-6"
             >
-              {text}
+              <div>
+                <div aria-hidden className="mb-3 text-mbtYellow">
+                  ★★★★★
+                </div>
+                <p className="text-sm text-white/80">&ldquo;{review.text}&rdquo;</p>
+              </div>
+              <div className="mt-5 border-t border-white/10 pt-3">
+                <p className="text-sm font-semibold text-white">{review.name}</p>
+                <p className="text-xs text-white/40">{review.credential}</p>
+              </div>
             </div>
           ))}
         </div>
