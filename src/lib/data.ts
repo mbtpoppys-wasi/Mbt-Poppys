@@ -1,5 +1,12 @@
 import { createServerClient } from "@/lib/supabase/server";
-import type { CafeProduct, FuelPrice, GalleryImage, Special, StatusBanner } from "@/lib/types";
+import type {
+  CafeProduct,
+  FuelAnnouncement,
+  FuelPrice,
+  GalleryImage,
+  Special,
+  StatusBanner,
+} from "@/lib/types";
 
 // Fallback data lets the site render before Supabase env vars / tables exist
 // (first `npm run dev` right after cloning), rather than crashing the page.
@@ -56,11 +63,7 @@ export async function getGalleryImages(): Promise<GalleryImage[]> {
   }
 }
 
-export function getGalleryImageUrl(filename: string): string {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!url) return "";
-  return `${url}/storage/v1/object/public/station-photos/${filename}`;
-}
+export { getStoragePhotoUrl, getStoragePhotoUrl as getGalleryImageUrl } from "@/lib/storage-url";
 
 export async function getActiveSpecials(): Promise<Special[]> {
   try {
@@ -88,6 +91,37 @@ export async function getAllSpecials(): Promise<Special[]> {
 
     if (error || !data) return [];
     return data as Special[];
+  } catch {
+    return [];
+  }
+}
+
+export async function getActiveFuelAnnouncements(): Promise<FuelAnnouncement[]> {
+  try {
+    const supabase = createServerClient();
+    const { data, error } = await supabase
+      .from("fuel_announcements")
+      .select("*")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false });
+
+    if (error || !data) return [];
+    return data as FuelAnnouncement[];
+  } catch {
+    return [];
+  }
+}
+
+export async function getAllFuelAnnouncements(): Promise<FuelAnnouncement[]> {
+  try {
+    const supabase = createServerClient();
+    const { data, error } = await supabase
+      .from("fuel_announcements")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error || !data) return [];
+    return data as FuelAnnouncement[];
   } catch {
     return [];
   }

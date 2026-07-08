@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { siteConfig } from "@/lib/site-config";
 
 export default function Footer() {
@@ -25,13 +24,9 @@ export default function Footer() {
 
         <div className="my-8 h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-        <div className="flex w-full flex-col items-center justify-between gap-3 text-[10px] font-medium uppercase tracking-widest text-white/40 sm:flex-row">
-          <p>
-            &copy; {new Date().getFullYear()} {siteConfig.businessName}. All rights reserved.
-          </p>
-          <Link href="/admin" className="text-white/20 hover:text-white/40">
-            Owner login
-          </Link>
+        <div className="flex w-full flex-col items-center justify-center gap-2 text-[10px] font-medium uppercase tracking-widest text-white/40">
+          <p>&copy; {new Date().getFullYear()} All Rights Reserved</p>
+          <p>Website designed and developed by The Sign Hub</p>
         </div>
       </div>
     </footer>

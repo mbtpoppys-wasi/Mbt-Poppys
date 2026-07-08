@@ -8,7 +8,7 @@ import CafeSection from "@/components/CafeSection";
 import Gallery from "@/components/Gallery";
 import Reviews from "@/components/Reviews";
 import LocationSection from "@/components/LocationSection";
-import ServicesSection from "@/components/ServicesSection";
+import FuelUpdatesSection from "@/components/FuelUpdatesSection";
 import Footer from "@/components/Footer";
 
 export default function HomePage() {
@@ -33,7 +33,7 @@ export default function HomePage() {
 
       <NightShowcase />
 
-      <ServicesSection />
+      <FuelUpdatesSection />
 
       <ImageFeatureRow
         src="/images/buzz-cafe-ventersdorp-convenience-store-interior.webp"

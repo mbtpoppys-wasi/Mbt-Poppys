@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { isAdminAuthenticated } from "@/lib/auth";
 import {
+  getAllFuelAnnouncements,
   getAllSpecials,
   getCafeProducts,
   getFuelPrices,
@@ -14,6 +15,7 @@ import AdminStatusBannerForm from "@/components/admin/AdminStatusBannerForm";
 import AdminCafeProductsPanel from "@/components/admin/AdminCafeProductsPanel";
 import AdminGalleryPanel from "@/components/admin/AdminGalleryPanel";
 import AdminSpecialsPanel from "@/components/admin/AdminSpecialsPanel";
+import AdminFuelAnnouncementsPanel from "@/components/admin/AdminFuelAnnouncementsPanel";
 
 export const metadata: Metadata = {
   title: "Owner Admin",
@@ -33,13 +35,15 @@ export default async function AdminPage() {
     );
   }
 
-  const [fuelPrices, statusBanner, cafeProducts, galleryImages, specials] = await Promise.all([
-    getFuelPrices(),
-    getStatusBanner(),
-    getCafeProducts(),
-    getGalleryImages(),
-    getAllSpecials(),
-  ]);
+  const [fuelPrices, statusBanner, cafeProducts, galleryImages, specials, fuelAnnouncements] =
+    await Promise.all([
+      getFuelPrices(),
+      getStatusBanner(),
+      getCafeProducts(),
+      getGalleryImages(),
+      getAllSpecials(),
+      getAllFuelAnnouncements(),
+    ]);
 
   const order: Record<string, number> = {
     petrol_95: 0,
@@ -109,6 +113,15 @@ export default async function AdminPage() {
           </h2>
           <div className="mt-4">
             <AdminSpecialsPanel specials={specials} />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="font-display text-lg font-bold uppercase tracking-wide text-mbt-yellow">
+            Fuel Updates
+          </h2>
+          <div className="mt-4">
+            <AdminFuelAnnouncementsPanel announcements={fuelAnnouncements} />
           </div>
         </section>
       </div>

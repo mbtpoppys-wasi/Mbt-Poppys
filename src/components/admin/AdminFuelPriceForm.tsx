@@ -1,8 +1,10 @@
 "use client";
 
+import { useRef } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { updateFuelPriceAction, type ActionResult } from "@/lib/actions";
 import type { FuelPrice } from "@/lib/types";
+import AutosaveIndicator from "@/components/admin/AutosaveIndicator";
 
 const initialState: ActionResult = { success: false, message: "" };
 
@@ -13,24 +15,27 @@ const LABELS: Record<FuelPrice["fuel_type"], string> = {
   diesel_10ppm: "Diesel 10ppm",
 };
 
-function SubmitButton() {
+function StatusSlot({ success, message }: { success: boolean; message: string }) {
   const { pending } = useFormStatus();
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="rounded-full bg-mbt-yellow px-5 py-2 font-display text-xs font-bold uppercase tracking-wide text-charcoal transition hover:brightness-95 disabled:opacity-60"
-    >
-      {pending ? "Saving…" : "Save"}
-    </button>
-  );
+  return <AutosaveIndicator pending={pending} success={success} message={message} />;
 }
 
 export default function AdminFuelPriceForm({ fuel }: { fuel: FuelPrice }) {
   const [state, formAction] = useFormState(updateFuelPriceAction, initialState);
+  const formRef = useRef<HTMLFormElement>(null);
+  const lastSaved = useRef(fuel.price);
+
+  const autosave = () => {
+    const input = formRef.current?.elements.namedItem("price") as HTMLInputElement | null;
+    const value = Number(input?.value);
+    if (!Number.isFinite(value) || value <= 0 || value === lastSaved.current) return;
+    lastSaved.current = value;
+    formRef.current?.requestSubmit();
+  };
 
   return (
     <form
+      ref={formRef}
       action={formAction}
       className="flex flex-col gap-3 rounded-xl border border-white/10 bg-charcoal p-5 sm:flex-row sm:items-center"
     >
@@ -47,15 +52,12 @@ export default function AdminFuelPriceForm({ fuel }: { fuel: FuelPrice }) {
           min="0"
           defaultValue={fuel.price}
           required
+          onBlur={autosave}
           className="w-28 rounded-lg border border-white/15 bg-charcoal-card px-3 py-2 text-white focus:border-mbt-yellow focus:outline-none"
         />
       </div>
-      <SubmitButton />
-      {state.message && (
-        <span className={`text-xs ${state.success ? "text-mbt-yellow" : "text-red-400"}`}>
-          {state.message}
-        </span>
-      )}
+      <span className="text-xs text-white/30">Saves automatically when you click away</span>
+      <StatusSlot success={state.success} message={state.message} />
     </form>
   );
 }

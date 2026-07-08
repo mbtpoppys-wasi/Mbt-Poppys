@@ -7,7 +7,7 @@ import { siteConfig } from "@/lib/site-config";
 const NAV_LINKS = [
   { href: "/#fuel-prices", label: "Live Pump Prices" },
   { href: "/#buzz-cafe", label: "BUZZ Café" },
-  { href: "/#services", label: "Our Services" },
+  { href: "/fuel-updates", label: "Fuel Updates" },
   { href: "/specials", label: "Specials" },
 ];
 

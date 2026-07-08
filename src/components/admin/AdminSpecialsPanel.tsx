@@ -4,10 +4,12 @@ import { useFormState, useFormStatus } from "react-dom";
 import {
   addSpecialAction,
   deleteSpecialAction,
+  moveSpecialAction,
   toggleSpecialAction,
   type ActionResult,
 } from "@/lib/actions";
 import type { Special } from "@/lib/types";
+import { getStoragePhotoUrl } from "@/lib/storage-url";
 
 const initialState: ActionResult = { success: false, message: "" };
 
@@ -54,6 +56,19 @@ function DeleteButton() {
   );
 }
 
+function MoveButton({ label }: { label: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="rounded-full border border-white/20 px-2.5 py-1 text-xs text-white/60 transition hover:bg-white/10 disabled:opacity-40"
+    >
+      {label}
+    </button>
+  );
+}
+
 function ToggleSpecialForm({ id, active }: { id: string; active: boolean }) {
   const [, formAction] = useFormState(toggleSpecialAction, initialState);
   return (
@@ -65,23 +80,37 @@ function ToggleSpecialForm({ id, active }: { id: string; active: boolean }) {
   );
 }
 
-function DeleteSpecialForm({ id }: { id: string }) {
+function DeleteSpecialForm({ id, imageFilename }: { id: string; imageFilename: string | null }) {
   const [, formAction] = useFormState(deleteSpecialAction, initialState);
   return (
     <form action={formAction}>
       <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="image_filename" value={imageFilename ?? ""} />
       <DeleteButton />
+    </form>
+  );
+}
+
+function MoveSpecialForm({ id, direction }: { id: string; direction: "up" | "down" }) {
+  const [, formAction] = useFormState(moveSpecialAction, initialState);
+  return (
+    <form action={formAction}>
+      <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="direction" value={direction} />
+      <MoveButton label={direction === "up" ? "↑" : "↓"} />
     </form>
   );
 }
 
 export default function AdminSpecialsPanel({ specials }: { specials: Special[] }) {
   const [state, formAction] = useFormState(addSpecialAction, initialState);
+  const sorted = [...specials].sort((a, b) => a.sort_order - b.sort_order);
 
   return (
     <div className="space-y-6">
       <form
         action={formAction}
+        encType="multipart/form-data"
         className="grid grid-cols-1 gap-3 rounded-xl border border-white/10 bg-charcoal p-5 sm:grid-cols-2"
       >
         <input
@@ -96,6 +125,12 @@ export default function AdminSpecialsPanel({ specials }: { specials: Special[] }
           placeholder="Short description"
           rows={2}
           className="rounded-lg border border-white/15 bg-charcoal-card px-3 py-2 text-white placeholder:text-white/40 focus:border-mbt-yellow focus:outline-none sm:col-span-2"
+        />
+        <input
+          type="file"
+          name="image"
+          accept="image/*"
+          className="rounded-lg border border-white/15 bg-charcoal-card px-3 py-2 text-white file:mr-3 file:rounded-full file:border-0 file:bg-mbt-yellow file:px-3 file:py-1 file:text-xs file:font-bold file:text-charcoal sm:col-span-2"
         />
         <input
           type="number"
@@ -115,20 +150,32 @@ export default function AdminSpecialsPanel({ specials }: { specials: Special[] }
       </form>
 
       <div className="space-y-2">
-        {specials.map((special) => (
+        {sorted.map((special) => (
           <div
             key={special.id}
             className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-charcoal p-4"
           >
-            <div>
-              <p className="font-semibold text-white">{special.title}</p>
-              {special.description && (
-                <p className="text-sm text-white/50">{special.description}</p>
+            <div className="flex items-center gap-3">
+              {special.image_filename && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={getStoragePhotoUrl(special.image_filename)}
+                  alt={special.title}
+                  className="h-12 w-12 flex-shrink-0 rounded-lg object-cover"
+                />
               )}
+              <div>
+                <p className="font-semibold text-white">{special.title}</p>
+                {special.description && (
+                  <p className="text-sm text-white/50">{special.description}</p>
+                )}
+              </div>
             </div>
             <div className="flex flex-shrink-0 items-center gap-2">
+              <MoveSpecialForm id={special.id} direction="up" />
+              <MoveSpecialForm id={special.id} direction="down" />
               <ToggleSpecialForm id={special.id} active={special.is_active} />
-              <DeleteSpecialForm id={special.id} />
+              <DeleteSpecialForm id={special.id} imageFilename={special.image_filename} />
             </div>
           </div>
         ))}

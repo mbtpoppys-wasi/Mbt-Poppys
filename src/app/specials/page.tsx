@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 import { getActiveSpecials } from "@/lib/data";
+import { getStoragePhotoUrl } from "@/lib/storage-url";
 
 export const metadata: Metadata = {
   title: "Specials",
@@ -41,17 +43,32 @@ export default async function SpecialsPage() {
               <Reveal
                 key={special.id}
                 delay={index * 80}
-                className="rounded-2xl border border-white/10 bg-mbtCard p-8 transition duration-300 hover:-translate-y-1 hover:border-mbtYellow/40"
+                className="overflow-hidden rounded-2xl border border-white/10 bg-mbtCard transition duration-300 hover:-translate-y-1 hover:border-mbtYellow/40"
               >
-                <span className="inline-block rounded-full bg-mbtYellow/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-mbtYellow">
-                  Special
-                </span>
-                <h2 className="mt-4 font-display text-2xl font-bold text-white">{special.title}</h2>
-                {special.description && (
-                  <p className="mt-3 text-sm leading-relaxed text-white/60">
-                    {special.description}
-                  </p>
+                {special.image_filename && (
+                  <div className="relative h-56 w-full">
+                    <Image
+                      src={getStoragePhotoUrl(special.image_filename)}
+                      alt={special.title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 50vw"
+                      className="object-cover"
+                    />
+                  </div>
                 )}
+                <div className="p-8">
+                  <span className="inline-block rounded-full bg-mbtYellow/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-mbtYellow">
+                    Special
+                  </span>
+                  <h2 className="mt-4 font-display text-2xl font-bold text-white">
+                    {special.title}
+                  </h2>
+                  {special.description && (
+                    <p className="mt-3 text-sm leading-relaxed text-white/60">
+                      {special.description}
+                    </p>
+                  )}
+                </div>
               </Reveal>
             ))}
           </div>
