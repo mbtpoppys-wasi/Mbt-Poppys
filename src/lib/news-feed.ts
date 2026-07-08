@@ -8,17 +8,22 @@ export interface NewsItem {
 }
 
 // News24's feeds return 403 to server-side/bot requests, so this pulls from
-// two SA outlets that publish genuinely public RSS feeds instead, filtered
-// down to fuel/petrol/diesel-related stories.
-const FEEDS = [
-  { url: "https://mybroadband.co.za/news/feed", source: "MyBroadband" },
-  { url: "https://www.moneyweb.co.za/feed/", source: "Moneyweb" },
+// two SA outlets' dedicated "fuel-price" tag feeds instead. MyBroadband's
+// tag feed tested cleanly on-topic, so it's trusted as-is; Moneyweb's tag
+// feed mixes in unrelated finance stories, so it still gets the keyword
+// filter as a safety net.
+const FEEDS: { url: string; source: string; trusted: boolean }[] = [
+  { url: "https://mybroadband.co.za/news/tag/fuel-price/feed", source: "MyBroadband", trusted: true },
+  { url: "https://www.moneyweb.co.za/tag/fuel-price/feed/", source: "Moneyweb", trusted: false },
 ];
 
-const FUEL_KEYWORDS = ["fuel", "petrol", "diesel", "fuel price", "fuel levy", "sarb", "zar/usd", "brent crude", "oil price"];
+// English + Afrikaans (Moneyweb publishes bilingual content) — kept narrow
+// on purpose. Broader macro-econ terms (SARB, ZAR/USD, oil price, brent
+// crude) matched way too much unrelated finance news in testing.
+const FUEL_KEYWORDS = ["fuel", "petrol", "diesel", "brandstof"];
 
-function isFuelRelated(title: string, categories: string[]): boolean {
-  const haystack = `${title} ${categories.join(" ")}`.toLowerCase();
+function isFuelRelated(title: string): boolean {
+  const haystack = title.toLowerCase();
   return FUEL_KEYWORDS.some((kw) => haystack.includes(kw));
 }
 
@@ -32,7 +37,7 @@ function textOf(value: unknown): string {
   return "";
 }
 
-async function fetchFeed(url: string, source: string): Promise<NewsItem[]> {
+async function fetchFeed(url: string, source: string, trusted: boolean): Promise<NewsItem[]> {
   try {
     const res = await fetch(url, {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; MBTPoppysBot/1.0)" },
@@ -46,31 +51,20 @@ async function fetchFeed(url: string, source: string): Promise<NewsItem[]> {
     const list = Array.isArray(items) ? items : items ? [items] : [];
 
     return list
-      .map((item: Record<string, unknown>) => {
-        const title = textOf(item.title);
-        const rawCategory = item.category;
-        const categories = Array.isArray(rawCategory)
-          ? rawCategory.map(textOf)
-          : rawCategory
-            ? [textOf(rawCategory)]
-            : [];
-        return {
-          title,
-          link: textOf(item.link) || String(item.link ?? ""),
-          pubDate: textOf(item.pubDate) || String(item.pubDate ?? ""),
-          source,
-          categories,
-        };
-      })
-      .filter((item) => item.title && item.link && isFuelRelated(item.title, item.categories))
-      .map(({ categories: _categories, ...rest }) => rest);
+      .map((item: Record<string, unknown>) => ({
+        title: textOf(item.title),
+        link: textOf(item.link) || String(item.link ?? ""),
+        pubDate: textOf(item.pubDate) || String(item.pubDate ?? ""),
+        source,
+      }))
+      .filter((item) => item.title && item.link && (trusted || isFuelRelated(item.title)));
   } catch {
     return [];
   }
 }
 
 export async function getFuelNews(): Promise<NewsItem[]> {
-  const results = await Promise.all(FEEDS.map((feed) => fetchFeed(feed.url, feed.source)));
+  const results = await Promise.all(FEEDS.map((feed) => fetchFeed(feed.url, feed.source, feed.trusted)));
   const merged = results.flat();
 
   merged.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());

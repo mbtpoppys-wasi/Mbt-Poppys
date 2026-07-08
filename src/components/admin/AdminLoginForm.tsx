@@ -29,14 +29,24 @@ export default function AdminLoginForm() {
       <h1 className="font-display text-xl font-bold uppercase tracking-wide text-white">
         Owner Admin
       </h1>
-      <p className="mt-1 text-sm text-white/50">Enter the shared admin password.</p>
+      <p className="mt-1 text-sm text-white/50">Sign in with your admin email and password.</p>
+
+      <input
+        type="email"
+        name="email"
+        required
+        placeholder="Email"
+        autoComplete="username"
+        className="mt-6 w-full rounded-full border border-white/15 bg-charcoal px-5 py-3 text-white placeholder:text-white/40 focus:border-mbt-yellow focus:outline-none"
+      />
 
       <input
         type="password"
         name="password"
         required
         placeholder="Password"
-        className="mt-6 w-full rounded-full border border-white/15 bg-charcoal px-5 py-3 text-white placeholder:text-white/40 focus:border-mbt-yellow focus:outline-none"
+        autoComplete="current-password"
+        className="mt-3 w-full rounded-full border border-white/15 bg-charcoal px-5 py-3 text-white placeholder:text-white/40 focus:border-mbt-yellow focus:outline-none"
       />
 
       {state.message && <p className="mt-3 text-sm text-red-400">{state.message}</p>}

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { checkAdminPassword, clearAdminSession, isAdminAuthenticated, setAdminSession } from "@/lib/auth";
+import { checkAdminCredentials, clearAdminSession, isAdminAuthenticated, setAdminSession } from "@/lib/auth";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import type { CafeCategory, CafeProductStatus, FuelType } from "@/lib/types";
 
@@ -11,10 +11,11 @@ const CAFE_STATUSES = ["available", "out_of_stock", "coming_soon", "temporarily_
 export type ActionResult = { success: boolean; message: string };
 
 export async function loginAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
+  const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
 
-  if (!checkAdminPassword(password)) {
-    return { success: false, message: "Incorrect password." };
+  if (!checkAdminCredentials(email, password)) {
+    return { success: false, message: "Incorrect email or password." };
   }
 
   await setAdminSession();

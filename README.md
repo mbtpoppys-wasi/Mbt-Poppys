@@ -98,6 +98,7 @@ Copy `.env.example` to `.env.local` for local dev, and add the same keys in Verc
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → Project URL | Yes |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → API → anon / `sb_publishable_...` key | Yes |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Project Settings → API → service_role / `sb_secret_...` key | **No — server only** |
+| `ADMIN_EMAIL` | You choose | No |
 | `ADMIN_PASSWORD` | You choose | No |
 | `ADMIN_SESSION_SECRET` | You generate, e.g. `openssl rand -hex 32` | No |
 | `GOOGLE_PLACES_API_KEY` | Google Cloud Console → Credentials (restrict to Places API) | **No — server only** |

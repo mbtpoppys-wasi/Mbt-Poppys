@@ -61,11 +61,19 @@ export async function isAdminAuthenticated(): Promise<boolean> {
   return isValidToken(token);
 }
 
-export function checkAdminPassword(password: string): boolean {
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!expected) return false;
-  const a = Buffer.from(password);
+function timingSafeStringEqual(input: string, expected: string): boolean {
+  const a = Buffer.from(input);
   const b = Buffer.from(expected);
   if (a.length !== b.length) return false;
   return timingSafeEqual(a, b);
+}
+
+export function checkAdminCredentials(email: string, password: string): boolean {
+  const expectedEmail = process.env.ADMIN_EMAIL;
+  const expectedPassword = process.env.ADMIN_PASSWORD;
+  if (!expectedEmail || !expectedPassword) return false;
+
+  const emailOk = timingSafeStringEqual(email.trim().toLowerCase(), expectedEmail.trim().toLowerCase());
+  const passwordOk = timingSafeStringEqual(password, expectedPassword);
+  return emailOk && passwordOk;
 }
