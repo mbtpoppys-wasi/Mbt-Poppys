@@ -86,6 +86,31 @@ never through the browser.
    `006_storage_bucket.sql` in the SQL editor (bucket creation via the dashboard
    doesn't add the read policy for you).
 
+### 2.3 Set up the admin login
+
+`/admin` checks credentials against the `admin_credentials` table (see
+`supabase/migrations/013_admin_credentials.sql`), not environment variables —
+this is deliberate since the repo is public, so a real password never gets
+committed to git.
+
+1. Run `013_admin_credentials.sql` in the SQL editor (creates the table only).
+2. Generate a bcrypt hash of your password (Node one-liner, run locally):
+   ```bash
+   node -e "console.log(require('bcryptjs').hashSync('your-real-password', 10))"
+   ```
+3. Insert your login directly in the Supabase SQL editor (never commit this
+   statement anywhere):
+   ```sql
+   insert into public.admin_credentials (email, password_hash)
+   values ('you@example.com', 'paste-the-bcrypt-hash-here');
+   ```
+4. To change the password later, generate a new hash and:
+   ```sql
+   update public.admin_credentials
+   set password_hash = 'new-bcrypt-hash', updated_at = now()
+   where email = 'you@example.com';
+   ```
+
 ---
 
 ## 3. Environment variables
@@ -98,8 +123,6 @@ Copy `.env.example` to `.env.local` for local dev, and add the same keys in Verc
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → Project URL | Yes |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → API → anon / `sb_publishable_...` key | Yes |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Project Settings → API → service_role / `sb_secret_...` key | **No — server only** |
-| `ADMIN_EMAIL` | You choose | No |
-| `ADMIN_PASSWORD` | You choose | No |
 | `ADMIN_SESSION_SECRET` | You generate, e.g. `openssl rand -hex 32` | No |
 | `GOOGLE_PLACES_API_KEY` | Google Cloud Console → Credentials (restrict to Places API) | **No — server only** |
 | `GOOGLE_PLACES_PLACE_ID` | [Place ID Finder](https://developers.google.com/maps/documentation/places/web-service/place-id) | No |

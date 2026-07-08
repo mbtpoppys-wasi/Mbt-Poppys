@@ -1,5 +1,7 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
+import bcrypt from "bcryptjs";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 
 const COOKIE_NAME = "mbt_admin_session";
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
@@ -61,19 +63,26 @@ export async function isAdminAuthenticated(): Promise<boolean> {
   return isValidToken(token);
 }
 
-function timingSafeStringEqual(input: string, expected: string): boolean {
-  const a = Buffer.from(input);
-  const b = Buffer.from(expected);
-  if (a.length !== b.length) return false;
-  return timingSafeEqual(a, b);
-}
+// Checked against the admin_credentials table (Supabase), not env vars —
+// the row is created once via SQL editor with a bcrypt-hashed password
+// (see supabase/migrations/013_admin_credentials.sql). RLS on that table
+// has no policies, so only this service-role query can ever read it.
+export async function checkAdminCredentials(email: string, password: string): Promise<boolean> {
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!normalizedEmail || !password) return false;
 
-export function checkAdminCredentials(email: string, password: string): boolean {
-  const expectedEmail = process.env.ADMIN_EMAIL;
-  const expectedPassword = process.env.ADMIN_PASSWORD;
-  if (!expectedEmail || !expectedPassword) return false;
+  try {
+    const supabase = createServiceRoleClient();
+    const { data, error } = await supabase
+      .from("admin_credentials")
+      .select("password_hash")
+      .eq("email", normalizedEmail)
+      .maybeSingle();
 
-  const emailOk = timingSafeStringEqual(email.trim().toLowerCase(), expectedEmail.trim().toLowerCase());
-  const passwordOk = timingSafeStringEqual(password, expectedPassword);
-  return emailOk && passwordOk;
+    if (error || !data) return false;
+
+    return await bcrypt.compare(password, data.password_hash);
+  } catch {
+    return false;
+  }
 }

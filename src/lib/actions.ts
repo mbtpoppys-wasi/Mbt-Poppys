@@ -14,7 +14,7 @@ export async function loginAction(_prevState: ActionResult, formData: FormData):
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
 
-  if (!checkAdminCredentials(email, password)) {
+  if (!(await checkAdminCredentials(email, password))) {
     return { success: false, message: "Incorrect email or password." };
   }
 
