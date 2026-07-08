@@ -63,26 +63,46 @@ export async function isAdminAuthenticated(): Promise<boolean> {
   return isValidToken(token);
 }
 
+export type AdminCredentialsCheck =
+  | { ok: true }
+  | { ok: false; reason: "config" | "invalid" };
+
 // Checked against the admin_credentials table (Supabase), not env vars —
 // the row is created once via SQL editor with a bcrypt-hashed password
 // (see supabase/migrations/013_admin_credentials.sql). RLS on that table
 // has no policies, so only this service-role query can ever read it.
-export async function checkAdminCredentials(email: string, password: string): Promise<boolean> {
+//
+// Distinguishes "server can't reach Supabase" (missing/wrong
+// SUPABASE_SERVICE_ROLE_KEY) from "wrong email/password" — otherwise a
+// misconfigured env var just looks like a silently wrong password, which
+// is exactly what happened the first time this shipped.
+export async function checkAdminCredentials(
+  email: string,
+  password: string
+): Promise<AdminCredentialsCheck> {
   const normalizedEmail = email.trim().toLowerCase();
-  if (!normalizedEmail || !password) return false;
+  if (!normalizedEmail || !password) return { ok: false, reason: "invalid" };
 
+  let supabase;
   try {
-    const supabase = createServiceRoleClient();
-    const { data, error } = await supabase
-      .from("admin_credentials")
-      .select("password_hash")
-      .eq("email", normalizedEmail)
-      .maybeSingle();
-
-    if (error || !data) return false;
-
-    return await bcrypt.compare(password, data.password_hash);
-  } catch {
-    return false;
+    supabase = createServiceRoleClient();
+  } catch (err) {
+    console.error("[admin-login] Supabase client init failed:", err);
+    return { ok: false, reason: "config" };
   }
+
+  const { data, error } = await supabase
+    .from("admin_credentials")
+    .select("password_hash")
+    .eq("email", normalizedEmail)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[admin-login] Supabase query failed:", error.message);
+    return { ok: false, reason: "config" };
+  }
+  if (!data) return { ok: false, reason: "invalid" };
+
+  const matches = await bcrypt.compare(password, data.password_hash);
+  return matches ? { ok: true } : { ok: false, reason: "invalid" };
 }

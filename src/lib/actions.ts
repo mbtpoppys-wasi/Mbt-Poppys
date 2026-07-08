@@ -14,7 +14,14 @@ export async function loginAction(_prevState: ActionResult, formData: FormData):
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
 
-  if (!(await checkAdminCredentials(email, password))) {
+  const check = await checkAdminCredentials(email, password);
+  if (!check.ok) {
+    if (check.reason === "config") {
+      return {
+        success: false,
+        message: "Server can't reach the database — check SUPABASE_SERVICE_ROLE_KEY in Vercel.",
+      };
+    }
     return { success: false, message: "Incorrect email or password." };
   }
 
