@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
   };
 
   if (url && serviceKey) {
-    const supabase = createClient(url, serviceKey, { auth: { persistSession: false } });
+    const supabase = createServiceRoleClient();
     const { data, error } = await supabase
       .from("admin_credentials")
       .select("email, password_hash")
@@ -38,4 +38,26 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json(report);
+}
+
+/**
+ * One-time repair: upsert the admin row with the known-good bcrypt hash.
+ * Only the hash is stored here — the plaintext password never appears.
+ */
+export async function POST(req: NextRequest) {
+  if (req.nextUrl.searchParams.get("key") !== "mbt-diag-7391") {
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
+
+  const supabase = createServiceRoleClient();
+  const { error } = await supabase.from("admin_credentials").upsert(
+    {
+      email: "mbtpoppys@gmail.com",
+      password_hash: "$2b$10$Tf403CjNsNJBoRFSBMwkhONE21nchtiQukGFayJmTXRm/gtz9E4Yu",
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "email" }
+  );
+
+  return NextResponse.json({ ok: !error, error: error ? error.message : null });
 }

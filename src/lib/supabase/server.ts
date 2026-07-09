@@ -1,6 +1,19 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 /**
+ * Env values pasted into Vercel sometimes carry a trailing slash or path
+ * segment, which makes supabase-js build request URLs the API gateway
+ * rejects ("Invalid path specified in request URL"). Reduce to the origin.
+ */
+function normalizeSupabaseUrl(url: string): string {
+  try {
+    return new URL(url.trim()).origin;
+  } catch {
+    return url.trim();
+  }
+}
+
+/**
  * Read-only, anon-key client for server-rendered public data fetches
  * (fuel prices, cafe products, gallery images, status banner).
  */
@@ -12,7 +25,7 @@ export function createServerClient() {
     throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY");
   }
 
-  return createSupabaseClient(url, anonKey, {
+  return createSupabaseClient(normalizeSupabaseUrl(url), anonKey, {
     auth: { persistSession: false },
   });
 }
@@ -29,7 +42,7 @@ export function createServiceRoleClient() {
     throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
   }
 
-  return createSupabaseClient(url, serviceKey, {
+  return createSupabaseClient(normalizeSupabaseUrl(url), serviceKey, {
     auth: { persistSession: false },
   });
 }
