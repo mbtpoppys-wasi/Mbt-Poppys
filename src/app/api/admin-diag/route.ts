@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
     hasSupabaseUrl: Boolean(url),
     supabaseUrlHost: url ? new URL(url).host : null,
     hasServiceRoleKey: Boolean(serviceKey),
+    hasSessionSecret: Boolean(process.env.ADMIN_SESSION_SECRET),
     serviceRoleKeyPrefix: serviceKey ? serviceKey.slice(0, 10) : null,
     serviceRoleKeyLength: serviceKey ? serviceKey.length : 0,
   };
