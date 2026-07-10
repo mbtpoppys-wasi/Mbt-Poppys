@@ -174,15 +174,58 @@ function ModalShell({
   );
 }
 
-function SubmitRow({ pending, label }: { pending: boolean; label: string }) {
+function SubmitRow({
+  pending,
+  label,
+  disabled = false,
+}: {
+  pending: boolean;
+  label: string;
+  disabled?: boolean;
+}) {
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={pending || disabled}
       className="mt-2 w-full rounded-xl bg-mbtYellow px-6 py-3 font-display text-sm font-bold uppercase tracking-wide text-mbtDark shadow-lg shadow-mbtYellow/25 transition hover:brightness-95 active:scale-[0.99] disabled:opacity-60"
     >
       {pending ? "Saving…" : label}
     </button>
+  );
+}
+
+// Shown whenever an image file is selected in an add/edit form. The
+// acknowledgement checkbox is mandatory — the Save button stays disabled
+// until it's ticked, so the size requirement can't be skipped past.
+export const IMAGE_SIZE_RULE = "1920 × 1080 px (16:9 landscape)";
+
+function ImageSizeNotice({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <div className="rounded-xl border border-mbtDark bg-mbtYellow/15 p-3">
+      <p className="text-xs font-bold text-mbtDark">
+        📐 Required image size: {IMAGE_SIZE_RULE}
+      </p>
+      <p className="mt-1 text-[11px] leading-relaxed text-mbtDark">
+        The website shows this image in a 16:9 frame. Generate or export your artwork at
+        exactly 1920 × 1080 pixels and it will display in full — any other size will be
+        cropped to fit.
+      </p>
+      <label className="mt-2 flex cursor-pointer items-start gap-2 text-[11px] font-bold text-mbtDark">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+          className="mt-0.5 h-4 w-4 flex-shrink-0 accent-mbtYellow"
+        />
+        I have read this — my image is 1920 × 1080 (16:9)
+      </label>
+    </div>
   );
 }
 
@@ -1191,6 +1234,7 @@ function ProductForm({
   const [status, setStatus] = useState<CafeProductStatus>(product?.status ?? "available");
   const [isBestPrice, setIsBestPrice] = useState(product?.is_best_price ?? false);
   const [file, setFile] = useState<File | null>(null);
+  const [sizeAck, setSizeAck] = useState(false);
   const [pending, setPending] = useState(false);
 
   const isNew = product === null;
@@ -1199,6 +1243,10 @@ function ProductForm({
     <form
       onSubmit={async (e) => {
         e.preventDefault();
+        if (file && !sizeAck) {
+          alert("Please read the image size note and tick the confirmation first.");
+          return;
+        }
         setPending(true);
         const fields: Record<string, string | File> = {
           category,
@@ -1326,7 +1374,13 @@ function ProductForm({
         )}
       </label>
 
-      <SubmitRow pending={pending} label={isNew ? "Add Product" : "Save Changes"} />
+      {file && <ImageSizeNotice checked={sizeAck} onChange={setSizeAck} />}
+
+      <SubmitRow
+        pending={pending}
+        disabled={Boolean(file) && !sizeAck}
+        label={isNew ? "Add Product" : "Save Changes"}
+      />
     </form>
   );
 }
@@ -1343,6 +1397,7 @@ function SpecialForm({
   const [title, setTitle] = useState(special?.title ?? "");
   const [description, setDescription] = useState(special?.description ?? "");
   const [file, setFile] = useState<File | null>(null);
+  const [sizeAck, setSizeAck] = useState(false);
   const [pending, setPending] = useState(false);
 
   const isNew = special === null;
@@ -1351,6 +1406,10 @@ function SpecialForm({
     <form
       onSubmit={async (e) => {
         e.preventDefault();
+        if (file && !sizeAck) {
+          alert("Please read the image size note and tick the confirmation first.");
+          return;
+        }
         setPending(true);
         const fields: Record<string, string | File> = {
           title: title.trim(),
@@ -1423,7 +1482,13 @@ function SpecialForm({
         />
       </label>
 
-      <SubmitRow pending={pending} label={isNew ? "Add Special" : "Save Changes"} />
+      {file && <ImageSizeNotice checked={sizeAck} onChange={setSizeAck} />}
+
+      <SubmitRow
+        pending={pending}
+        disabled={Boolean(file) && !sizeAck}
+        label={isNew ? "Add Special" : "Save Changes"}
+      />
     </form>
   );
 }

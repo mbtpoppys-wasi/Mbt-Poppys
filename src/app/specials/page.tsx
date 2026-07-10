@@ -46,7 +46,10 @@ export default async function SpecialsPage() {
                 className="overflow-hidden rounded-2xl border border-white/10 bg-mbtCard transition duration-300 hover:-translate-y-1 hover:border-mbtYellow/40"
               >
                 {special.image_filename && (
-                  <div className="relative h-56 w-full">
+                  // Locked to 16:9 so a 1920×1080 upload displays with zero
+                  // cropping on every screen (the admin upload notice
+                  // promises exactly this).
+                  <div className="relative aspect-video w-full">
                     <Image
                       src={getStoragePhotoUrl(special.image_filename)}
                       alt={special.title}

@@ -66,7 +66,9 @@ export default function CafeSectionClient({ products }: { products: CafeProduct[
               }`}
             >
               {product.image_filename ? (
-                <div className="relative h-40 w-full overflow-hidden">
+                // 16:9 like the specials cards, so a 1920×1080 upload never
+                // crops — the admin upload notice promises exactly this
+                <div className="relative aspect-video w-full overflow-hidden">
                   <Image
                     src={getStoragePhotoUrl(product.image_filename)}
                     alt={product.name}
