@@ -225,7 +225,7 @@ export default function AdminLoginScreen() {
               <p className="font-display text-base font-bold uppercase tracking-wide text-mbtDark">
                 MBT Poppys
               </p>
-              <p className="text-xs text-mbtDark/50">Owner Admin Portal</p>
+              <p className="text-xs text-mbtDark">Owner Admin Portal</p>
             </div>
           </div>
 
@@ -233,19 +233,19 @@ export default function AdminLoginScreen() {
             <h2 className="font-display text-2xl font-bold uppercase tracking-wide text-mbtDark">
               Welcome back
             </h2>
-            <p className="mt-2 text-sm text-mbtDark/50">
+            <p className="mt-2 text-sm text-mbtDark">
               Sign in with your admin email and password to manage the station.
             </p>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-4">
               <label className="block">
-                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-mbtDark/60">
+                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-mbtDark">
                   Email
                 </span>
                 <div className="relative">
                   <Mail
                     size={16}
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-mbtDark/30"
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-mbtDark"
                   />
                   <input
                     type="email"
@@ -254,19 +254,19 @@ export default function AdminLoginScreen() {
                     placeholder="owner@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl border border-mbtDark/10 bg-mbtGray/60 py-3 pl-11 pr-4 text-sm text-mbtDark placeholder:text-mbtDark/30 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40"
+                    className="w-full rounded-xl border border-mbtDark/10 bg-mbtGray/60 py-3 pl-11 pr-4 text-sm text-mbtDark placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40"
                   />
                 </div>
               </label>
 
               <label className="block">
-                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-mbtDark/60">
+                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-mbtDark">
                   Password
                 </span>
                 <div className="relative">
                   <Lock
                     size={16}
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-mbtDark/30"
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-mbtDark"
                   />
                   <input
                     type={showPassword ? "text" : "password"}
@@ -275,13 +275,13 @@ export default function AdminLoginScreen() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-mbtDark/10 bg-mbtGray/60 py-3 pl-11 pr-12 text-sm text-mbtDark placeholder:text-mbtDark/30 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40"
+                    className="w-full rounded-xl border border-mbtDark/10 bg-mbtGray/60 py-3 pl-11 pr-12 text-sm text-mbtDark placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-mbtDark/40 transition hover:bg-mbtDark/5 hover:text-mbtDark"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-mbtDark transition hover:bg-mbtDark/5 hover:text-mbtDark"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -308,7 +308,7 @@ export default function AdminLoginScreen() {
             </form>
           </div>
 
-          <p className="mt-6 text-center text-xs text-mbtDark/40">
+          <p className="mt-6 text-center text-xs text-mbtDark">
             Owner access only. All changes publish to the live site immediately.
           </p>
         </motion.div>

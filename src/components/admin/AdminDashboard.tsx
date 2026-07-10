@@ -132,8 +132,8 @@ function formatDate(iso: string): string {
 /* ────────────────────────────── shared UI ────────────────────────────── */
 
 const inputClass =
-  "w-full rounded-xl border border-mbtDark/10 bg-mbtGray/60 px-4 py-2.5 text-sm text-mbtDark placeholder:text-mbtDark/30 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40";
-const labelClass = "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-mbtDark/60";
+  "w-full rounded-xl border border-mbtDark/10 bg-mbtGray/60 px-4 py-2.5 text-sm text-mbtDark placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40";
+const labelClass = "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-mbtDark";
 
 function ModalShell({
   title,
@@ -168,7 +168,7 @@ function ModalShell({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-full p-2 text-mbtDark/40 transition hover:bg-mbtDark/5 hover:text-mbtDark"
+            className="rounded-full p-2 text-mbtDark transition hover:bg-mbtDark/5 hover:text-mbtDark"
           >
             <X size={18} />
           </button>
@@ -242,7 +242,7 @@ function EditButton({ onClick }: { onClick: () => void }) {
       type="button"
       onClick={onClick}
       aria-label="Edit"
-      className="flex h-8 w-8 items-center justify-center rounded-full text-mbtDark/60 transition hover:bg-mbtYellow/20 hover:text-mbtDark"
+      className="flex h-8 w-8 items-center justify-center rounded-full text-mbtDark transition hover:bg-mbtYellow/20 hover:text-mbtDark"
     >
       <Pencil size={15} />
     </button>
@@ -292,10 +292,10 @@ function SectionCard({
           <h2 className="font-display text-sm font-bold uppercase tracking-wide text-mbtDark">
             {title}
           </h2>
-          {subtitle && <p className="truncate text-xs text-mbtDark/40">{subtitle}</p>}
+          {subtitle && <p className="truncate text-xs text-mbtDark">{subtitle}</p>}
         </div>
         {typeof count === "number" && (
-          <span className="rounded-full bg-mbtDark/5 px-2.5 py-1 text-xs font-bold text-mbtDark/50">
+          <span className="rounded-full bg-mbtDark/5 px-2.5 py-1 text-xs font-bold text-mbtDark">
             {count}
           </span>
         )}
@@ -687,7 +687,7 @@ export default function AdminDashboard(props: Props) {
                   {typeof counts[id] === "number" && (
                     <span
                       className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                        active ? "bg-mbtDark/10 text-mbtDark/70" : "bg-white/10 text-white/50"
+                        active ? "bg-mbtDark/10 text-mbtDark" : "bg-white/10 text-white/50"
                       }`}
                     >
                       {counts[id]}
@@ -758,13 +758,13 @@ export default function AdminDashboard(props: Props) {
                 { label: "Gallery Photos", value: String(gallery.length), hint: "on the website" },
               ].map((stat) => (
                 <div key={stat.label} className="rounded-2xl bg-white p-4 shadow-sm shadow-black/5 sm:p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-mbtDark/40">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-mbtDark">
                     {stat.label}
                   </p>
                   <p className="mt-1 font-display text-xl font-bold text-mbtDark sm:text-2xl">
                     {stat.value}
                   </p>
-                  {stat.hint && <p className="mt-0.5 truncate text-[11px] text-mbtDark/35">{stat.hint}</p>}
+                  {stat.hint && <p className="mt-0.5 truncate text-[11px] text-mbtDark">{stat.hint}</p>}
                 </div>
               ))}
             </div>
@@ -773,25 +773,25 @@ export default function AdminDashboard(props: Props) {
             <div className="relative">
               <Search
                 size={16}
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-mbtDark/30"
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-mbtDark"
               />
               <input
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search products, specials, updates…"
-                className="w-full rounded-2xl border border-transparent bg-white py-3 pl-11 pr-24 text-sm shadow-sm shadow-black/5 placeholder:text-mbtDark/30 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/30"
+                className="w-full rounded-2xl border border-transparent bg-white py-3 pl-11 pr-24 text-sm shadow-sm shadow-black/5 placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/30"
               />
               {query && (
                 <span className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
-                  <span className="text-xs text-mbtDark/40">
+                  <span className="text-xs text-mbtDark">
                     {matchCount} result{matchCount === 1 ? "" : "s"}
                   </span>
                   <button
                     type="button"
                     onClick={() => setSearch("")}
                     aria-label="Clear search"
-                    className="rounded-full bg-mbtDark/5 p-1 text-mbtDark/40 hover:bg-mbtDark/10"
+                    className="rounded-full bg-mbtDark/5 p-1 text-mbtDark hover:bg-mbtDark/10"
                   >
                     <X size={13} />
                   </button>
@@ -810,7 +810,7 @@ export default function AdminDashboard(props: Props) {
                     >
                       <div>
                         <p className="text-sm font-bold text-mbtDark">{FUEL_LABELS[f.fuel_type]}</p>
-                        <p className="mt-0.5 text-[11px] text-mbtDark/35">
+                        <p className="mt-0.5 text-[11px] text-mbtDark">
                           Updated {formatDate(f.updated_at)}
                         </p>
                       </div>
@@ -836,7 +836,7 @@ export default function AdminDashboard(props: Props) {
                 {banner ? (
                   <BannerForm banner={banner} onSave={saveBanner} />
                 ) : (
-                  <p className="text-sm text-mbtDark/40">
+                  <p className="text-sm text-mbtDark">
                     No banner row found — run the status_banner migration first.
                   </p>
                 )}
@@ -857,7 +857,7 @@ export default function AdminDashboard(props: Props) {
                     if (list.length === 0) return null;
                     return (
                       <div key={cat}>
-                        <p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-mbtDark/50">
+                        <p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-mbtDark">
                           <span>{CATEGORY_META[cat].icon}</span>
                           {CATEGORY_META[cat].label}
                           <span className="rounded-full bg-mbtDark/5 px-2 py-0.5 text-[10px]">
@@ -889,7 +889,7 @@ export default function AdminDashboard(props: Props) {
                                   )}
                                 </p>
                                 {p.description && (
-                                  <p className="truncate text-xs text-mbtDark/40">{p.description}</p>
+                                  <p className="truncate text-xs text-mbtDark">{p.description}</p>
                                 )}
                               </div>
                               <span
@@ -908,7 +908,7 @@ export default function AdminDashboard(props: Props) {
                     );
                   })}
                   {filteredProducts.length === 0 && (
-                    <p className="py-4 text-center text-sm text-mbtDark/40">
+                    <p className="py-4 text-center text-sm text-mbtDark">
                       {query ? "No products match your search." : "No products yet — tap Add to create one."}
                     </p>
                   )}
@@ -933,7 +933,7 @@ export default function AdminDashboard(props: Props) {
                           disabled={i === 0 || Boolean(query)}
                           onClick={() => moveSpecial(s, "up")}
                           aria-label="Move up"
-                          className="text-mbtDark/30 transition hover:text-mbtDark disabled:opacity-20"
+                          className="text-mbtDark transition hover:text-mbtDark disabled:opacity-20"
                         >
                           <ChevronUp size={15} />
                         </button>
@@ -942,7 +942,7 @@ export default function AdminDashboard(props: Props) {
                           disabled={i === sortedSpecials.length - 1 || Boolean(query)}
                           onClick={() => moveSpecial(s, "down")}
                           aria-label="Move down"
-                          className="text-mbtDark/30 transition hover:text-mbtDark disabled:opacity-20"
+                          className="text-mbtDark transition hover:text-mbtDark disabled:opacity-20"
                         >
                           <ChevronDown size={15} />
                         </button>
@@ -962,7 +962,7 @@ export default function AdminDashboard(props: Props) {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-mbtDark">{s.title}</p>
                         {s.description && (
-                          <p className="truncate text-xs text-mbtDark/40">{s.description}</p>
+                          <p className="truncate text-xs text-mbtDark">{s.description}</p>
                         )}
                       </div>
                       <Toggle on={s.is_active} onChange={() => toggleSpecial(s)} />
@@ -973,7 +973,7 @@ export default function AdminDashboard(props: Props) {
                     </div>
                   ))}
                   {sortedSpecials.length === 0 && (
-                    <p className="py-4 text-center text-sm text-mbtDark/40">
+                    <p className="py-4 text-center text-sm text-mbtDark">
                       {query ? "No specials match your search." : "No specials yet — tap Add to create one."}
                     </p>
                   )}
@@ -999,7 +999,7 @@ export default function AdminDashboard(props: Props) {
                         className="aspect-square w-full object-cover"
                       />
                       <div className="flex items-center justify-between gap-1 p-2">
-                        <p className="min-w-0 truncate text-[11px] text-mbtDark/50">
+                        <p className="min-w-0 truncate text-[11px] text-mbtDark">
                           {img.caption || img.alt_text}
                         </p>
                         <span className="flex flex-shrink-0 items-center">
@@ -1011,7 +1011,7 @@ export default function AdminDashboard(props: Props) {
                   ))}
                 </div>
                 {gallery.length === 0 && (
-                  <p className="py-4 text-center text-sm text-mbtDark/40">
+                  <p className="py-4 text-center text-sm text-mbtDark">
                     No photos yet — tap Add to upload one.
                   </p>
                 )}
@@ -1037,7 +1037,7 @@ export default function AdminDashboard(props: Props) {
                     <div key={a.id} className="flex items-center gap-3 px-3 py-2.5">
                       <div className="min-w-0 flex-1">
                         <p className="text-sm text-mbtDark">{a.message}</p>
-                        <p className="mt-0.5 text-[11px] text-mbtDark/35">{formatDate(a.created_at)}</p>
+                        <p className="mt-0.5 text-[11px] text-mbtDark">{formatDate(a.created_at)}</p>
                       </div>
                       <Toggle on={a.is_active} onChange={() => toggleAnnouncement(a)} />
                       <span className="flex flex-shrink-0 items-center gap-0.5">
@@ -1049,7 +1049,7 @@ export default function AdminDashboard(props: Props) {
                     </div>
                   ))}
                   {filteredAnnouncements.length === 0 && (
-                    <p className="py-4 text-center text-sm text-mbtDark/40">
+                    <p className="py-4 text-center text-sm text-mbtDark">
                       {query ? "No updates match your search." : "No announcements yet."}
                     </p>
                   )}
@@ -1197,7 +1197,7 @@ function FuelForm({ fuel, onSave }: { fuel: FuelPrice; onSave: (price: number) =
           className={`${inputClass} font-display text-lg font-bold`}
         />
       </label>
-      <p className="text-xs text-mbtDark/40">
+      <p className="text-xs text-mbtDark">
         Currently {formatRand(fuel.price)} · last updated {formatDate(fuel.updated_at)}
       </p>
       <SubmitRow pending={pending} label="Save Price" />
@@ -1230,7 +1230,7 @@ function BannerForm({
       <div className="flex items-center justify-between rounded-xl border border-mbtDark/5 bg-mbtGray/50 px-4 py-3">
         <div>
           <p className="text-sm font-semibold text-mbtDark">Show banner on the website</p>
-          <p className="text-xs text-mbtDark/40">
+          <p className="text-xs text-mbtDark">
             {isActive ? "Visible to all visitors" : "Hidden"}
           </p>
         </div>
@@ -1393,7 +1393,7 @@ function ProductForm({
           className={`${inputClass} file:mr-3 file:rounded-full file:border-0 file:bg-mbtYellow file:px-3 file:py-1 file:text-xs file:font-bold file:text-mbtDark`}
         />
         {!isNew && product.image_filename && !file && (
-          <span className="mt-1 block text-[11px] text-mbtDark/35">
+          <span className="mt-1 block text-[11px] text-mbtDark">
             Keeping the current photo unless you choose a new one.
           </span>
         )}
