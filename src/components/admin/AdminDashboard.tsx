@@ -10,6 +10,7 @@ import {
   ChevronDown,
   ChevronUp,
   Coffee,
+  Copy,
   Fuel,
   LayoutDashboard,
   LogOut,
@@ -17,7 +18,9 @@ import {
   Pencil,
   Plus,
   Search,
+  Sparkles,
   Trash2,
+  Wand2,
   X,
 } from "lucide-react";
 import {
@@ -39,6 +42,7 @@ import {
   type ActionResult,
 } from "@/lib/actions";
 import { getStoragePhotoUrl } from "@/lib/storage-url";
+import { MASTER_PROMPT, PROMPT_CATEGORIES, TOTAL_PROMPTS, buildPrompt } from "@/lib/image-prompts";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import type {
   CafeCategory,
@@ -103,7 +107,7 @@ const STATUS_META: Record<CafeProductStatus, { label: string; className: string 
   temporarily_removed: { label: "Removed", className: "bg-gray-200 text-gray-600" },
 };
 
-type SectionId = "overview" | "fuel" | "banner" | "cafe" | "specials" | "updates";
+type SectionId = "overview" | "fuel" | "banner" | "cafe" | "specials" | "updates" | "prompts";
 
 const INACTIVITY_MS = 30 * 60 * 1000;
 
@@ -274,6 +278,57 @@ function InlineDelete({ onConfirm }: { onConfirm: () => Promise<void> }) {
   );
 }
 
+function PromptRow({
+  title,
+  text,
+  copied,
+  expanded,
+  onCopy,
+  onToggle,
+}: {
+  title: string;
+  text: string;
+  copied: boolean;
+  expanded: boolean;
+  onCopy: () => void;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="border-b border-mbtDark last:border-b-0">
+      <div className="flex items-center gap-2 px-3 py-2.5">
+        <button
+          type="button"
+          onClick={onToggle}
+          className="flex min-w-0 flex-1 items-center gap-2 text-left"
+        >
+          <ChevronDown
+            size={14}
+            className={`flex-shrink-0 text-mbtDark transition-transform ${expanded ? "rotate-180" : ""}`}
+          />
+          <span className="truncate text-sm font-semibold text-mbtDark">{title}</span>
+        </button>
+        <button
+          type="button"
+          onClick={onCopy}
+          className={`flex flex-shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition ${
+            copied
+              ? "bg-emerald-500 text-white"
+              : "bg-mbtYellow text-mbtDark hover:brightness-95 active:scale-95"
+          }`}
+        >
+          {copied ? <Check size={13} /> : <Copy size={13} />}
+          {copied ? "Copied!" : "Copy"}
+        </button>
+      </div>
+      {expanded && (
+        <pre className="max-h-64 overflow-y-auto whitespace-pre-wrap border-t border-mbtDark bg-mbtGray/60 px-4 py-3 text-[11px] leading-relaxed text-mbtDark">
+          {text}
+        </pre>
+      )}
+    </div>
+  );
+}
+
 function EditButton({ onClick }: { onClick: () => void }) {
   return (
     <button
@@ -369,6 +424,7 @@ const NAV: { id: SectionId; label: string; icon: React.ComponentType<{ size?: nu
   { id: "cafe", label: "BUZZ Café", icon: Coffee },
   { id: "specials", label: "Specials", icon: BadgePercent },
   { id: "updates", label: "Fuel Updates", icon: Bell },
+  { id: "prompts", label: "Image Prompts", icon: Wand2 },
 ];
 
 export default function AdminDashboard(props: Props) {
@@ -405,6 +461,28 @@ export default function AdminDashboard(props: Props) {
 
   const handleLogout = useCallback(() => {
     void logoutAction();
+  }, []);
+
+  // Image-prompts page: which prompt is expanded / just copied.
+  const [copiedPrompt, setCopiedPrompt] = useState<string | null>(null);
+  const [expandedPrompt, setExpandedPrompt] = useState<string | null>(null);
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const copyPrompt = useCallback(async (key: string, text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // clipboard API unavailable — fall back to a hidden textarea
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    setCopiedPrompt(key);
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+    copyTimer.current = setTimeout(() => setCopiedPrompt(null), 1500);
   }, []);
 
   // 30-min inactivity auto-logout.
@@ -686,6 +764,7 @@ export default function AdminDashboard(props: Props) {
                 cafe: products.length,
                 specials: specials.length,
                 updates: announcements.length,
+                prompts: TOTAL_PROMPTS,
               };
               const active = section === id;
               return (
@@ -1049,6 +1128,87 @@ export default function AdminDashboard(props: Props) {
                       {query ? "No updates match your search." : "No announcements yet."}
                     </p>
                   )}
+                </div>
+              </SectionCard>
+            )}
+
+            {/* ── Image prompts (own page only, not on Overview) ── */}
+            {section === "prompts" && (
+              <SectionCard
+                icon={Wand2}
+                title="Image Prompts"
+                subtitle="Ready-made ChatGPT prompts for your special ads"
+                count={TOTAL_PROMPTS}
+              >
+                <div className="space-y-6">
+                  <div className="rounded-xl border border-mbtDark bg-mbtYellow/15 p-4">
+                    <p className="text-sm font-bold text-mbtDark">How to use</p>
+                    <ol className="mt-1.5 list-decimal space-y-1 pl-4 text-xs leading-relaxed text-mbtDark">
+                      <li>
+                        Tap <strong>Copy</strong> on any prompt below.
+                      </li>
+                      <li>Paste it into ChatGPT.</li>
+                      <li>
+                        Replace every <strong>[BRACKETED]</strong> part with your deal details
+                        (product, offer, price, dates).
+                      </li>
+                      <li>
+                        Generate. Every prompt forces the MBT look (yellow headlines, white text,
+                        black background — the product keeps its own brand colours) and the exact
+                        website size: <strong>1920 × 1080, 16:9, 4K quality</strong>.
+                      </li>
+                    </ol>
+                  </div>
+
+                  <div className="overflow-hidden rounded-xl border-2 border-mbtYellow bg-white">
+                    <div className="flex items-center gap-2 bg-mbtYellow/25 px-3 py-2">
+                      <Sparkles size={14} className="text-mbtDark" />
+                      <span className="text-xs font-bold uppercase tracking-wide text-mbtDark">
+                        Start here — the master prompt
+                      </span>
+                    </div>
+                    <PromptRow
+                      title="Fill in one line, ChatGPT designs the rest"
+                      text={MASTER_PROMPT}
+                      copied={copiedPrompt === "master"}
+                      expanded={expandedPrompt === "master"}
+                      onCopy={() => copyPrompt("master", MASTER_PROMPT)}
+                      onToggle={() =>
+                        setExpandedPrompt(expandedPrompt === "master" ? null : "master")
+                      }
+                    />
+                  </div>
+
+                  {PROMPT_CATEGORIES.map((cat) => (
+                    <div key={cat.category}>
+                      <p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-mbtDark">
+                        <span>{cat.icon}</span>
+                        {cat.category}
+                        <span className="rounded-full bg-mbtDark/5 px-2 py-0.5 text-[10px]">
+                          {cat.items.length}
+                        </span>
+                      </p>
+                      <div className="overflow-hidden rounded-xl border border-mbtDark">
+                        {cat.items.map((item) => {
+                          const key = `${cat.category}:${item.title}`;
+                          const text = buildPrompt(item.scene);
+                          return (
+                            <PromptRow
+                              key={key}
+                              title={item.title}
+                              text={text}
+                              copied={copiedPrompt === key}
+                              expanded={expandedPrompt === key}
+                              onCopy={() => copyPrompt(key, text)}
+                              onToggle={() =>
+                                setExpandedPrompt(expandedPrompt === key ? null : key)
+                              }
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </SectionCard>
             )}
