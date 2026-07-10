@@ -111,6 +111,24 @@ committed to git.
    where email = 'you@example.com';
    ```
 
+The login screen also rate-limits itself client-side (5 failed attempts → 5-minute
+lockout with a countdown) and the dashboard auto-signs out after 30 minutes of
+inactivity.
+
+### 2.4 Enable Realtime (live updates on the public site)
+
+Run `supabase/migrations/014_enable_realtime.sql` in the SQL editor. This adds all
+public content tables to the `supabase_realtime` publication, which is what makes
+an admin edit appear on every open visitor's browser within ~1 second, no refresh
+needed (the `LiveRefresh` component subscribes to `postgres_changes` and calls
+`router.refresh()` on any event).
+
+If you skip this step nothing breaks — live updates just silently don't happen
+until the visitor reloads. You can also enable it by hand: Dashboard →
+**Database → Replication → supabase_realtime** → toggle on `fuel_prices`,
+`status_banner`, `cafe_products`, `gallery_images`, `specials`,
+`fuel_announcements`.
+
 ---
 
 ## 3. Environment variables
@@ -268,11 +286,15 @@ src/
     page.tsx              Home page, assembles all sections
     layout.tsx             Fonts, metadata, JSON-LD
     sitemap.ts / robots.ts SEO routes
-    admin/page.tsx          Password-gated owner dashboard
+    admin/page.tsx          Password-gated owner dashboard (hidden, noindex)
   components/               Section components (Hero, FuelPricesSection, etc.)
-  components/admin/          Admin dashboard forms
+    LiveRefresh.tsx          Realtime → router.refresh() (live public pages)
+  components/admin/
+    AdminLoginScreen.tsx     Split-panel login (lockout, show/hide password)
+    AdminDashboard.tsx       Single-page dashboard (sidebar, stats, modals)
   lib/
     supabase/server.ts       Anon + service-role Supabase clients
+    supabase/client.ts       Browser anon client (Realtime subscriptions only)
     data.ts                  Server-side data fetchers (with fallback data)
     actions.ts               Server actions (admin writes, notification signup)
     auth.ts                  Admin password check + signed session cookie

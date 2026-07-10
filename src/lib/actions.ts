@@ -8,7 +8,16 @@ import type { CafeCategory, CafeProductStatus, FuelType } from "@/lib/types";
 
 const CAFE_STATUSES = ["available", "out_of_stock", "coming_soon", "temporarily_removed"];
 
-export type ActionResult = { success: boolean; message: string };
+// `ts` marks each result as distinct so the login screen's client-side
+// rate limiter can count repeated identical failures. `row` carries the
+// inserted record back so the dashboard can add it to local state with
+// the real DB-generated id.
+export type ActionResult = {
+  success: boolean;
+  message: string;
+  ts?: number;
+  row?: Record<string, unknown>;
+};
 
 export async function loginAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
   const email = String(formData.get("email") ?? "");
@@ -20,13 +29,16 @@ export async function loginAction(_prevState: ActionResult, formData: FormData):
       return {
         success: false,
         message: "Server can't reach the database — check SUPABASE_SERVICE_ROLE_KEY in Vercel.",
+        ts: Date.now(),
       };
     }
-    return { success: false, message: "Incorrect email or password." };
+    return { success: false, message: "Incorrect email or password.", ts: Date.now() };
   }
 
   await setAdminSession();
-  redirect("/admin");
+  // No redirect: the login screen clears its lockout counter, then
+  // router.refresh()es so the server page re-renders authenticated.
+  return { success: true, message: "", ts: Date.now() };
 }
 
 export async function logoutAction() {
@@ -119,20 +131,24 @@ export async function addCafeProductAction(_prevState: ActionResult, formData: F
     if (uploadError) return { success: false, message: uploadError.message };
   }
 
-  const { error } = await supabase.from("cafe_products").insert({
-    category,
-    name,
-    description,
-    sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
-    is_best_price: isBestPrice,
-    image_filename: imageFilename,
-  });
+  const { data, error } = await supabase
+    .from("cafe_products")
+    .insert({
+      category,
+      name,
+      description,
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
+      is_best_price: isBestPrice,
+      image_filename: imageFilename,
+    })
+    .select("*")
+    .single();
 
   if (error) return { success: false, message: error.message };
 
   revalidatePath("/");
   revalidatePath("/admin");
-  return { success: true, message: "Product added." };
+  return { success: true, message: "Product added.", row: data ?? undefined };
 }
 
 export async function updateCafeProductStatusAction(
@@ -175,6 +191,68 @@ export async function toggleCafeProductBestPriceAction(
   revalidatePath("/");
   revalidatePath("/admin");
   return { success: true, message: "Updated." };
+}
+
+export async function updateCafeProductAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdmin();
+
+  const id = String(formData.get("id") ?? "");
+  const category = String(formData.get("category") ?? "") as CafeCategory;
+  const name = String(formData.get("name") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const sortOrder = Number(formData.get("sort_order") ?? 0);
+  const status = String(formData.get("status") ?? "available") as CafeProductStatus;
+  const isBestPrice = formData.get("is_best_price") === "on" || formData.get("is_best_price") === "true";
+  const currentImage = String(formData.get("current_image") ?? "");
+  const file = formData.get("image");
+
+  if (!id) return { success: false, message: "Missing product id." };
+  if (!name) return { success: false, message: "Product name is required." };
+  if (
+    !["fresh_bakery", "cold_drinks", "travel_snacks", "tobacco_vapes", "braai_outdoor", "essentials"].includes(
+      category
+    )
+  ) {
+    return { success: false, message: "Invalid category." };
+  }
+  if (!CAFE_STATUSES.includes(status)) return { success: false, message: "Invalid status." };
+
+  const supabase = createServiceRoleClient();
+
+  let imageFilename: string | null = currentImage || null;
+  if (file instanceof File && file.size > 0) {
+    const newFilename = slugifyFilename("cafe-product", name, file.name);
+    const { error: uploadError } = await supabase.storage
+      .from("station-photos")
+      .upload(newFilename, await file.arrayBuffer(), {
+        contentType: file.type || "image/jpeg",
+        upsert: false,
+      });
+    if (uploadError) return { success: false, message: uploadError.message };
+    if (currentImage) {
+      await supabase.storage.from("station-photos").remove([currentImage]);
+    }
+    imageFilename = newFilename;
+  }
+
+  const { error } = await supabase
+    .from("cafe_products")
+    .update({
+      category,
+      name,
+      description,
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
+      status,
+      is_best_price: isBestPrice,
+      image_filename: imageFilename,
+    })
+    .eq("id", id);
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  return { success: true, message: "Product updated." };
 }
 
 export async function deleteCafeProductAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
@@ -237,18 +315,46 @@ export async function addGalleryImageAction(_prevState: ActionResult, formData: 
 
   if (uploadError) return { success: false, message: uploadError.message };
 
-  const { error: insertError } = await supabase.from("gallery_images").insert({
-    filename,
-    alt_text: altText,
-    caption,
-    sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
-  });
+  const { data, error: insertError } = await supabase
+    .from("gallery_images")
+    .insert({
+      filename,
+      alt_text: altText,
+      caption,
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
+    })
+    .select("*")
+    .single();
 
   if (insertError) return { success: false, message: insertError.message };
 
   revalidatePath("/");
   revalidatePath("/admin");
-  return { success: true, message: "Photo uploaded." };
+  return { success: true, message: "Photo uploaded.", row: data ?? undefined };
+}
+
+export async function updateGalleryImageAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdmin();
+
+  const id = String(formData.get("id") ?? "");
+  const altText = String(formData.get("alt_text") ?? "").trim();
+  const caption = String(formData.get("caption") ?? "").trim();
+  const sortOrder = Number(formData.get("sort_order") ?? 0);
+
+  if (!id) return { success: false, message: "Missing image id." };
+  if (!altText) return { success: false, message: "Alt text is required for SEO and accessibility." };
+
+  const supabase = createServiceRoleClient();
+  const { error } = await supabase
+    .from("gallery_images")
+    .update({ alt_text: altText, caption, sort_order: Number.isFinite(sortOrder) ? sortOrder : 0 })
+    .eq("id", id);
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  return { success: true, message: "Photo updated." };
 }
 
 export async function deleteGalleryImageAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
@@ -296,18 +402,69 @@ export async function addSpecialAction(_prevState: ActionResult, formData: FormD
     if (uploadError) return { success: false, message: uploadError.message };
   }
 
-  const { error } = await supabase.from("specials").insert({
-    title,
-    description,
-    sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
-    image_filename: imageFilename,
-  });
+  const { data, error } = await supabase
+    .from("specials")
+    .insert({
+      title,
+      description,
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
+      image_filename: imageFilename,
+    })
+    .select("*")
+    .single();
 
   if (error) return { success: false, message: error.message };
 
   revalidatePath("/specials");
   revalidatePath("/admin");
-  return { success: true, message: "Special added." };
+  return { success: true, message: "Special added.", row: data ?? undefined };
+}
+
+export async function updateSpecialAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdmin();
+
+  const id = String(formData.get("id") ?? "");
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const currentImage = String(formData.get("current_image") ?? "");
+  const file = formData.get("image");
+
+  if (!id) return { success: false, message: "Missing special id." };
+  if (!title) return { success: false, message: "Title is required." };
+
+  const supabase = createServiceRoleClient();
+
+  let imageFilename: string | null = currentImage || null;
+  if (file instanceof File && file.size > 0) {
+    const newFilename = slugifyFilename("special", title, file.name);
+    const { error: uploadError } = await supabase.storage
+      .from("station-photos")
+      .upload(newFilename, await file.arrayBuffer(), {
+        contentType: file.type || "image/jpeg",
+        upsert: false,
+      });
+    if (uploadError) return { success: false, message: uploadError.message };
+    if (currentImage) {
+      await supabase.storage.from("station-photos").remove([currentImage]);
+    }
+    imageFilename = newFilename;
+  }
+
+  const { error } = await supabase
+    .from("specials")
+    .update({
+      title,
+      description,
+      image_filename: imageFilename,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/specials");
+  revalidatePath("/admin");
+  return { success: true, message: "Special updated." };
 }
 
 export async function moveSpecialAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
@@ -399,13 +556,17 @@ export async function addFuelAnnouncementAction(
   if (!message) return { success: false, message: "Message is required." };
 
   const supabase = createServiceRoleClient();
-  const { error } = await supabase.from("fuel_announcements").insert({ message });
+  const { data, error } = await supabase
+    .from("fuel_announcements")
+    .insert({ message })
+    .select("*")
+    .single();
 
   if (error) return { success: false, message: error.message };
 
   revalidatePath("/fuel-updates");
   revalidatePath("/admin");
-  return { success: true, message: "Announcement posted." };
+  return { success: true, message: "Announcement posted.", row: data ?? undefined };
 }
 
 export async function toggleFuelAnnouncementAction(
@@ -429,6 +590,27 @@ export async function toggleFuelAnnouncementAction(
   revalidatePath("/fuel-updates");
   revalidatePath("/admin");
   return { success: true, message: "Updated." };
+}
+
+export async function updateFuelAnnouncementAction(
+  _prevState: ActionResult,
+  formData: FormData
+): Promise<ActionResult> {
+  await requireAdmin();
+
+  const id = String(formData.get("id") ?? "");
+  const message = String(formData.get("message") ?? "").trim();
+  if (!id) return { success: false, message: "Missing announcement id." };
+  if (!message) return { success: false, message: "Message is required." };
+
+  const supabase = createServiceRoleClient();
+  const { error } = await supabase.from("fuel_announcements").update({ message }).eq("id", id);
+
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/fuel-updates");
+  revalidatePath("/admin");
+  return { success: true, message: "Announcement updated." };
 }
 
 export async function deleteFuelAnnouncementAction(

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Orbitron, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import LiveRefresh from "@/components/LiveRefresh";
 import { siteConfig } from "@/lib/site-config";
 import { getPlaceRating } from "@/lib/google-places";
 import { buildGasStationJsonLd } from "@/lib/json-ld";
@@ -86,7 +87,10 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="font-body bg-mbtDark text-white antialiased">{children}</body>
+      <body className="font-body bg-mbtDark text-white antialiased">
+        <LiveRefresh />
+        {children}
+      </body>
     </html>
   );
 }
