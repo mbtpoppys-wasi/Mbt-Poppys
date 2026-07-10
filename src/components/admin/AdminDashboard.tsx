@@ -11,7 +11,6 @@ import {
   ChevronUp,
   Coffee,
   Fuel,
-  Images,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -24,11 +23,9 @@ import {
 import {
   addCafeProductAction,
   addFuelAnnouncementAction,
-  addGalleryImageAction,
   addSpecialAction,
   deleteCafeProductAction,
   deleteFuelAnnouncementAction,
-  deleteGalleryImageAction,
   deleteSpecialAction,
   logoutAction,
   moveSpecialAction,
@@ -37,7 +34,6 @@ import {
   updateCafeProductAction,
   updateFuelAnnouncementAction,
   updateFuelPriceAction,
-  updateGalleryImageAction,
   updateSpecialAction,
   updateStatusBannerAction,
   type ActionResult,
@@ -51,7 +47,6 @@ import type {
   FuelAnnouncement,
   FuelPrice,
   FuelType,
-  GalleryImage,
   Special,
   StatusBanner,
 } from "@/lib/types";
@@ -108,7 +103,7 @@ const STATUS_META: Record<CafeProductStatus, { label: string; className: string 
   temporarily_removed: { label: "Removed", className: "bg-gray-200 text-gray-600" },
 };
 
-type SectionId = "overview" | "fuel" | "banner" | "cafe" | "specials" | "gallery" | "updates";
+type SectionId = "overview" | "fuel" | "banner" | "cafe" | "specials" | "updates";
 
 const INACTIVITY_MS = 30 * 60 * 1000;
 
@@ -132,7 +127,7 @@ function formatDate(iso: string): string {
 /* ────────────────────────────── shared UI ────────────────────────────── */
 
 const inputClass =
-  "w-full rounded-xl border border-mbtDark/10 bg-mbtGray/60 px-4 py-2.5 text-sm text-mbtDark placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40";
+  "w-full rounded-xl border border-mbtDark bg-mbtGray/60 px-4 py-2.5 text-sm text-mbtDark placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40";
 const labelClass = "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-mbtDark";
 
 function ModalShell({
@@ -283,8 +278,8 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-2xl bg-white shadow-sm shadow-black/5">
-      <div className="flex items-center gap-3 border-b border-mbtDark/5 px-5 py-4">
+    <section className="overflow-hidden rounded-2xl border border-mbtDark bg-white shadow-sm shadow-black/5">
+      <div className="flex items-center gap-3 border-b border-mbtDark px-5 py-4">
         <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-mbtYellow/15 text-mbtDark">
           <Icon size={17} />
         </span>
@@ -313,8 +308,6 @@ type ModalState =
   | { type: "edit-product"; product: CafeProduct }
   | { type: "add-special" }
   | { type: "edit-special"; special: Special }
-  | { type: "add-photo" }
-  | { type: "edit-photo"; image: GalleryImage }
   | { type: "edit-announcement"; announcement: FuelAnnouncement }
   | null;
 
@@ -322,7 +315,6 @@ interface Props {
   fuelPrices: FuelPrice[];
   statusBanner: StatusBanner | null;
   cafeProducts: CafeProduct[];
-  galleryImages: GalleryImage[];
   specials: Special[];
   fuelAnnouncements: FuelAnnouncement[];
 }
@@ -333,7 +325,6 @@ const NAV: { id: SectionId; label: string; icon: React.ComponentType<{ size?: nu
   { id: "banner", label: "Status Banner", icon: AlertTriangle },
   { id: "cafe", label: "BUZZ Café", icon: Coffee },
   { id: "specials", label: "Specials", icon: BadgePercent },
-  { id: "gallery", label: "Gallery", icon: Images },
   { id: "updates", label: "Fuel Updates", icon: Bell },
 ];
 
@@ -343,7 +334,6 @@ export default function AdminDashboard(props: Props) {
   );
   const [banner, setBanner] = useState<StatusBanner | null>(props.statusBanner);
   const [products, setProducts] = useState<CafeProduct[]>(props.cafeProducts);
-  const [gallery, setGallery] = useState<GalleryImage[]>(props.galleryImages);
   const [specials, setSpecials] = useState<Special[]>(props.specials);
   const [announcements, setAnnouncements] = useState<FuelAnnouncement[]>(props.fuelAnnouncements);
 
@@ -354,7 +344,6 @@ export default function AdminDashboard(props: Props) {
   }, [props.fuelPrices]);
   useEffect(() => setBanner(props.statusBanner), [props.statusBanner]);
   useEffect(() => setProducts(props.cafeProducts), [props.cafeProducts]);
-  useEffect(() => setGallery(props.galleryImages), [props.galleryImages]);
   useEffect(() => setSpecials(props.specials), [props.specials]);
   useEffect(() => setAnnouncements(props.fuelAnnouncements), [props.fuelAnnouncements]);
 
@@ -413,7 +402,6 @@ export default function AdminDashboard(props: Props) {
 
   const addTargets: Partial<Record<SectionId, ModalState>> = {
     specials: { type: "add-special" },
-    gallery: { type: "add-photo" },
   };
   const addModalForSection: ModalState = addTargets[section] ?? { type: "add-product" };
 
@@ -504,16 +492,6 @@ export default function AdminDashboard(props: Props) {
       return;
     }
     setSpecials((prev) => prev.filter((x) => x.id !== s.id));
-    flashSaved();
-  };
-
-  const deletePhoto = async (img: GalleryImage) => {
-    const res = await runAction(deleteGalleryImageAction, { id: img.id, filename: img.filename });
-    if (!res.success) {
-      alert("Delete failed: " + res.message);
-      return;
-    }
-    setGallery((prev) => prev.filter((x) => x.id !== img.id));
     flashSaved();
   };
 
@@ -664,7 +642,6 @@ export default function AdminDashboard(props: Props) {
                 fuel: fuel.length,
                 cafe: products.length,
                 specials: specials.length,
-                gallery: gallery.length,
                 updates: announcements.length,
               };
               const active = section === id;
@@ -739,7 +716,7 @@ export default function AdminDashboard(props: Props) {
                 Welcome back, Wasiullah 👋
               </h2>
               <p className="mt-2 max-w-xl text-sm text-white/50">
-                Manage fuel prices, BUZZ Café products, specials and photos. Everything you save
+                Manage fuel prices, BUZZ Café products, specials and updates. Everything you save
                 here goes live on the website instantly.
               </p>
             </div>
@@ -757,9 +734,13 @@ export default function AdminDashboard(props: Props) {
                   value: String(activeSpecials),
                   hint: `${specials.length} total`,
                 },
-                { label: "Gallery Photos", value: String(gallery.length), hint: "on the website" },
+                {
+                  label: "Fuel Updates",
+                  value: String(announcements.length),
+                  hint: `${announcements.filter((a) => a.is_active).length} active`,
+                },
               ].map((stat) => (
-                <div key={stat.label} className="rounded-2xl bg-white p-4 shadow-sm shadow-black/5 sm:p-5">
+                <div key={stat.label} className="rounded-2xl border border-mbtDark bg-white p-4 shadow-sm shadow-black/5 sm:p-5">
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-mbtDark">
                     {stat.label}
                   </p>
@@ -788,7 +769,7 @@ export default function AdminDashboard(props: Props) {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search products, specials, updates…"
-                className="w-full rounded-2xl border border-transparent bg-white py-3 pl-11 pr-24 text-sm shadow-sm shadow-black/5 placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/30"
+                className="w-full rounded-2xl border border-mbtDark bg-white py-3 pl-11 pr-24 text-sm shadow-sm shadow-black/5 placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/30"
               />
               {query && (
                 <span className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
@@ -815,7 +796,7 @@ export default function AdminDashboard(props: Props) {
                   {fuel.map((f) => (
                     <div
                       key={f.id}
-                      className="flex items-center justify-between rounded-xl border border-mbtDark/5 bg-mbtGray/50 p-4"
+                      className="flex items-center justify-between rounded-xl border border-mbtDark bg-mbtGray/50 p-4"
                     >
                       <div>
                         <p className="text-sm font-bold text-mbtDark">{FUEL_LABELS[f.fuel_type]}</p>
@@ -873,7 +854,7 @@ export default function AdminDashboard(props: Props) {
                             {list.length}
                           </span>
                         </p>
-                        <div className="divide-y divide-mbtDark/5 rounded-xl border border-mbtDark/5">
+                        <div className="divide-y divide-mbtDark rounded-xl border border-mbtDark">
                           {list.map((p) => (
                             <div key={p.id} className="flex items-center gap-3 px-3 py-2.5">
                               {p.image_filename ? (
@@ -933,7 +914,7 @@ export default function AdminDashboard(props: Props) {
                 subtitle="Shown on the /specials page"
                 count={sortedSpecials.length}
               >
-                <div className="divide-y divide-mbtDark/5 rounded-xl border border-mbtDark/5">
+                <div className="divide-y divide-mbtDark rounded-xl border border-mbtDark">
                   {sortedSpecials.map((s, i) => (
                     <div key={s.id} className="flex items-center gap-3 px-3 py-2.5">
                       <span className="flex flex-shrink-0 flex-col">
@@ -990,43 +971,6 @@ export default function AdminDashboard(props: Props) {
               </SectionCard>
             )}
 
-            {/* ── Gallery ── */}
-            {showSection("gallery") && !query && (
-              <SectionCard
-                icon={Images}
-                title="Photo Gallery"
-                subtitle="Station photos on the homepage"
-                count={gallery.length}
-              >
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                  {gallery.map((img) => (
-                    <div key={img.id} className="group overflow-hidden rounded-xl border border-mbtDark/5">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={getStoragePhotoUrl(img.filename)}
-                        alt={img.alt_text}
-                        className="aspect-square w-full object-cover"
-                      />
-                      <div className="flex items-center justify-between gap-1 p-2">
-                        <p className="min-w-0 truncate text-[11px] text-mbtDark">
-                          {img.caption || img.alt_text}
-                        </p>
-                        <span className="flex flex-shrink-0 items-center">
-                          <EditButton onClick={() => setModal({ type: "edit-photo", image: img })} />
-                          <InlineDelete onConfirm={() => deletePhoto(img)} />
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {gallery.length === 0 && (
-                  <p className="py-4 text-center text-sm text-mbtDark">
-                    No photos yet — tap Add to upload one.
-                  </p>
-                )}
-              </SectionCard>
-            )}
-
             {/* ── Fuel updates ── */}
             {showSection("updates") && (
               <SectionCard
@@ -1041,7 +985,7 @@ export default function AdminDashboard(props: Props) {
                     flashSaved();
                   }}
                 />
-                <div className="mt-4 divide-y divide-mbtDark/5 rounded-xl border border-mbtDark/5">
+                <div className="mt-4 divide-y divide-mbtDark rounded-xl border border-mbtDark">
                   {filteredAnnouncements.map((a) => (
                     <div key={a.id} className="flex items-center gap-3 px-3 py-2.5">
                       <div className="min-w-0 flex-1">
@@ -1130,32 +1074,6 @@ export default function AdminDashboard(props: Props) {
           </ModalShell>
         )}
 
-        {modal?.type === "add-photo" && (
-          <ModalShell key="add-photo" title="Upload Photo" onClose={() => setModal(null)}>
-            <PhotoAddForm
-              nextSortOrder={gallery.length}
-              onDone={(saved) => {
-                setGallery((prev) => [...prev, saved]);
-                flashSaved();
-                setModal(null);
-              }}
-            />
-          </ModalShell>
-        )}
-
-        {modal?.type === "edit-photo" && (
-          <ModalShell key="edit-photo" title="Edit Photo Details" onClose={() => setModal(null)}>
-            <PhotoEditForm
-              image={modal.image}
-              onDone={(saved) => {
-                setGallery((prev) => prev.map((g) => (g.id === saved.id ? saved : g)));
-                flashSaved();
-                setModal(null);
-              }}
-            />
-          </ModalShell>
-        )}
-
         {modal?.type === "edit-announcement" && (
           <ModalShell key="edit-announcement" title="Edit Announcement" onClose={() => setModal(null)}>
             <AnnouncementEditForm
@@ -1236,7 +1154,7 @@ function BannerForm({
       }}
       className="space-y-4"
     >
-      <div className="flex items-center justify-between rounded-xl border border-mbtDark/5 bg-mbtGray/50 px-4 py-3">
+      <div className="flex items-center justify-between rounded-xl border border-mbtDark bg-mbtGray/50 px-4 py-3">
         <div>
           <p className="text-sm font-semibold text-mbtDark">Show banner on the website</p>
           <p className="text-xs text-mbtDark">
@@ -1506,140 +1424,6 @@ function SpecialForm({
       </label>
 
       <SubmitRow pending={pending} label={isNew ? "Add Special" : "Save Changes"} />
-    </form>
-  );
-}
-
-function PhotoAddForm({
-  nextSortOrder,
-  onDone,
-}: {
-  nextSortOrder: number;
-  onDone: (saved: GalleryImage) => void;
-}) {
-  const [file, setFile] = useState<File | null>(null);
-  const [altText, setAltText] = useState("");
-  const [caption, setCaption] = useState("");
-  const [pending, setPending] = useState(false);
-
-  return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        if (!file) {
-          alert("Please choose a photo to upload.");
-          return;
-        }
-        setPending(true);
-        const res = await runAction(addGalleryImageAction, {
-          file,
-          alt_text: altText.trim(),
-          caption: caption.trim(),
-          sort_order: String(nextSortOrder),
-        });
-        setPending(false);
-        if (!res.success) {
-          alert("Upload failed: " + res.message);
-          return;
-        }
-        const row = res.row as unknown as GalleryImage | undefined;
-        if (row) onDone(row);
-      }}
-      className="space-y-4"
-    >
-      <label className="block">
-        <span className={labelClass}>Photo</span>
-        <input
-          type="file"
-          required
-          accept="image/*"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          className={`${inputClass} file:mr-3 file:rounded-full file:border-0 file:bg-mbtYellow file:px-3 file:py-1 file:text-xs file:font-bold file:text-mbtDark`}
-        />
-      </label>
-      <label className="block">
-        <span className={labelClass}>Alt text (for SEO & accessibility)</span>
-        <input
-          type="text"
-          required
-          value={altText}
-          onChange={(e) => setAltText(e.target.value)}
-          placeholder="e.g. Forecourt at night with LED canopy"
-          className={inputClass}
-        />
-      </label>
-      <label className="block">
-        <span className={labelClass}>Caption (optional)</span>
-        <input
-          type="text"
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          placeholder="Shown under the photo"
-          className={inputClass}
-        />
-      </label>
-      <SubmitRow pending={pending} label="Upload Photo" />
-    </form>
-  );
-}
-
-function PhotoEditForm({
-  image,
-  onDone,
-}: {
-  image: GalleryImage;
-  onDone: (saved: GalleryImage) => void;
-}) {
-  const [altText, setAltText] = useState(image.alt_text);
-  const [caption, setCaption] = useState(image.caption);
-  const [pending, setPending] = useState(false);
-
-  return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        setPending(true);
-        const res = await runAction(updateGalleryImageAction, {
-          id: image.id,
-          alt_text: altText.trim(),
-          caption: caption.trim(),
-          sort_order: String(image.sort_order),
-        });
-        setPending(false);
-        if (!res.success) {
-          alert("Save failed: " + res.message);
-          return;
-        }
-        onDone({ ...image, alt_text: altText.trim(), caption: caption.trim() });
-      }}
-      className="space-y-4"
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={getStoragePhotoUrl(image.filename)}
-        alt={image.alt_text}
-        className="h-36 w-full rounded-xl object-cover"
-      />
-      <label className="block">
-        <span className={labelClass}>Alt text</span>
-        <input
-          type="text"
-          required
-          value={altText}
-          onChange={(e) => setAltText(e.target.value)}
-          className={inputClass}
-        />
-      </label>
-      <label className="block">
-        <span className={labelClass}>Caption</span>
-        <input
-          type="text"
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          className={inputClass}
-        />
-      </label>
-      <SubmitRow pending={pending} label="Save Changes" />
     </form>
   );
 }

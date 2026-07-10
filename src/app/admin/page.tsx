@@ -5,7 +5,6 @@ import {
   getAllSpecials,
   getCafeProducts,
   getFuelPrices,
-  getGalleryImages,
   getStatusBanner,
 } from "@/lib/data";
 import AdminLoginScreen from "@/components/admin/AdminLoginScreen";
@@ -29,12 +28,11 @@ export default async function AdminPage() {
     return <AdminLoginScreen />;
   }
 
-  const [fuelPrices, statusBanner, cafeProducts, galleryImages, specials, fuelAnnouncements] =
+  const [fuelPrices, statusBanner, cafeProducts, specials, fuelAnnouncements] =
     await Promise.all([
       getFuelPrices(),
       getStatusBanner(),
       getCafeProducts(),
-      getGalleryImages(),
       getAllSpecials(),
       getAllFuelAnnouncements(),
     ]);
@@ -44,7 +42,6 @@ export default async function AdminPage() {
       fuelPrices={fuelPrices}
       statusBanner={statusBanner}
       cafeProducts={cafeProducts}
-      galleryImages={galleryImages}
       specials={specials}
       fuelAnnouncements={fuelAnnouncements}
     />

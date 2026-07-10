@@ -254,7 +254,7 @@ export default function AdminLoginScreen() {
                     placeholder="owner@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl border border-mbtDark/10 bg-mbtGray/60 py-3 pl-11 pr-4 text-sm text-mbtDark placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40"
+                    className="w-full rounded-xl border border-mbtDark bg-mbtGray/60 py-3 pl-11 pr-4 text-sm text-mbtDark placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40"
                   />
                 </div>
               </label>
@@ -275,7 +275,7 @@ export default function AdminLoginScreen() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-mbtDark/10 bg-mbtGray/60 py-3 pl-11 pr-12 text-sm text-mbtDark placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40"
+                    className="w-full rounded-xl border border-mbtDark bg-mbtGray/60 py-3 pl-11 pr-12 text-sm text-mbtDark placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40"
                   />
                   <button
                     type="button"
