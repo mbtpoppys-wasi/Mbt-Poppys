@@ -724,7 +724,9 @@ export default function AdminDashboard(props: Props) {
         {/* ══ Main area ══ */}
         <main className="min-w-0 flex-1 overflow-y-auto">
           <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6 lg:p-8">
-            {/* banner + stats */}
+            {/* banner + stats — Overview only; section pages show just their own content */}
+            {section === "overview" && (
+              <>
             <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-mbtDark via-[#242424] to-mbtDark p-6 shadow-lg sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-widest text-mbtYellow">
                 {new Date().toLocaleDateString("en-ZA", {
@@ -734,7 +736,7 @@ export default function AdminDashboard(props: Props) {
                 })}
               </p>
               <h2 className="mt-1 font-display text-xl font-bold uppercase tracking-wide text-white sm:text-2xl">
-                Welcome back 👋
+                Welcome back, Wasiullah 👋
               </h2>
               <p className="mt-2 max-w-xl text-sm text-white/50">
                 Manage fuel prices, BUZZ Café products, specials and photos. Everything you save
@@ -768,8 +770,14 @@ export default function AdminDashboard(props: Props) {
                 </div>
               ))}
             </div>
+              </>
+            )}
 
-            {/* search */}
+            {/* search — only where it filters something (products/specials/updates) */}
+            {(section === "overview" ||
+              section === "cafe" ||
+              section === "specials" ||
+              section === "updates") && (
             <div className="relative">
               <Search
                 size={16}
@@ -798,6 +806,7 @@ export default function AdminDashboard(props: Props) {
                 </span>
               )}
             </div>
+            )}
 
             {/* ── Fuel prices ── */}
             {showSection("fuel") && !query && (
