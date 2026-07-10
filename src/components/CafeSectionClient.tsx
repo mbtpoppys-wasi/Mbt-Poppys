@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import type { CafeCategory, CafeProduct } from "@/lib/types";
 import { getStoragePhotoUrl } from "@/lib/storage-url";
 
-const TABS: { key: CafeCategory; label: string; icon: string }[] = [
+const CATEGORY_TABS: { key: CafeCategory; label: string; icon: string }[] = [
   { key: "fresh_bakery", label: "Fresh Bakery", icon: "☕" },
   { key: "cold_drinks", label: "Cold Drinks", icon: "🥤" },
   { key: "travel_snacks", label: "Travel Snacks", icon: "🍬" },
@@ -14,23 +14,52 @@ const TABS: { key: CafeCategory; label: string; icon: string }[] = [
   { key: "essentials", label: "Essentials", icon: "🏧" },
 ];
 
+const CATEGORY_LABELS: Record<CafeCategory, string> = Object.fromEntries(
+  CATEGORY_TABS.map((t) => [t.key, t.label])
+) as Record<CafeCategory, string>;
+
+const CATEGORY_ORDER: Record<CafeCategory, number> = Object.fromEntries(
+  CATEGORY_TABS.map((t, i) => [t.key, i])
+) as Record<CafeCategory, number>;
+
 const STATUS_BADGE: Record<string, { label: string; className: string } | null> = {
   available: null,
   out_of_stock: { label: "Out of Stock", className: "bg-red-500/15 text-red-400 border-red-500/30" },
   coming_soon: { label: "Coming Soon", className: "bg-sky-500/15 text-sky-400 border-sky-500/30" },
 };
 
-export default function CafeSectionClient({ products }: { products: CafeProduct[] }) {
-  const [active, setActive] = useState<CafeCategory>("fresh_bakery");
+type ActiveTab = CafeCategory | "all";
 
-  const filtered = products
-    .filter((p) => p.category === active && p.status !== "temporarily_removed")
-    .sort((a, b) => a.sort_order - b.sort_order);
+export default function CafeSectionClient({ products }: { products: CafeProduct[] }) {
+  const [active, setActive] = useState<ActiveTab>("all");
+  const [search, setSearch] = useState("");
+
+  const query = search.trim().toLowerCase();
+
+  const filtered = useMemo(
+    () =>
+      products
+        .filter((p) => p.status !== "temporarily_removed")
+        .filter((p) => active === "all" || p.category === active)
+        .filter(
+          (p) =>
+            !query ||
+            p.name.toLowerCase().includes(query) ||
+            p.description.toLowerCase().includes(query)
+        )
+        .sort(
+          (a, b) =>
+            CATEGORY_ORDER[a.category] - CATEGORY_ORDER[b.category] ||
+            a.sort_order - b.sort_order
+        ),
+    [products, active, query]
+  );
 
   return (
     <div>
+      {/* category filters */}
       <div className="flex flex-wrap justify-center gap-3">
-        {TABS.map((tab) => (
+        {[{ key: "all" as const, label: "All Items", icon: "🐝" }, ...CATEGORY_TABS].map((tab) => (
           <button
             key={tab.key}
             type="button"
@@ -47,10 +76,35 @@ export default function CafeSectionClient({ products }: { products: CafeProduct[
         ))}
       </div>
 
-      <div key={active} className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {/* search */}
+      <div className="relative mx-auto mt-8 max-w-md">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40"
+        >
+          <circle cx="11" cy="11" r="7" strokeWidth={2} />
+          <path strokeLinecap="round" strokeWidth={2} d="m20 20-3.5-3.5" />
+        </svg>
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search the menu…"
+          className="w-full rounded-full border border-white/15 bg-mbtCard py-3 pl-11 pr-20 text-sm text-white placeholder:text-white/40 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/30"
+        />
+        {query && (
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-white/40">
+            {filtered.length} found
+          </span>
+        )}
+      </div>
+
+      <div key={`${active}-${query}`} className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.length === 0 && (
           <p className="col-span-full text-center text-white/40">
-            New items coming soon to this category.
+            {query ? "Nothing matches your search — try another word." : "New items coming soon to this category."}
           </p>
         )}
         {filtered.map((product, index) => {
@@ -93,6 +147,11 @@ export default function CafeSectionClient({ products }: { products: CafeProduct[
               )}
 
               <div className="p-6">
+                {active === "all" && (
+                  <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-mbtYellow/80">
+                    {CATEGORY_LABELS[product.category]}
+                  </p>
+                )}
                 <h3 className="font-display text-lg font-bold text-white">{product.name}</h3>
                 {product.description && (
                   <p className="mt-2 text-sm text-white/60">{product.description}</p>

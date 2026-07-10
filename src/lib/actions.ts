@@ -147,6 +147,7 @@ export async function addCafeProductAction(_prevState: ActionResult, formData: F
   if (error) return { success: false, message: error.message };
 
   revalidatePath("/");
+  revalidatePath("/buzz-cafe");
   revalidatePath("/admin");
   return { success: true, message: "Product added.", row: data ?? undefined };
 }
@@ -167,6 +168,7 @@ export async function updateCafeProductStatusAction(
   if (error) return { success: false, message: error.message };
 
   revalidatePath("/");
+  revalidatePath("/buzz-cafe");
   revalidatePath("/admin");
   return { success: true, message: "Status updated." };
 }
@@ -189,6 +191,7 @@ export async function toggleCafeProductBestPriceAction(
   if (error) return { success: false, message: error.message };
 
   revalidatePath("/");
+  revalidatePath("/buzz-cafe");
   revalidatePath("/admin");
   return { success: true, message: "Updated." };
 }
@@ -251,6 +254,7 @@ export async function updateCafeProductAction(_prevState: ActionResult, formData
   if (error) return { success: false, message: error.message };
 
   revalidatePath("/");
+  revalidatePath("/buzz-cafe");
   revalidatePath("/admin");
   return { success: true, message: "Product updated." };
 }
@@ -273,6 +277,7 @@ export async function deleteCafeProductAction(_prevState: ActionResult, formData
   if (error) return { success: false, message: error.message };
 
   revalidatePath("/");
+  revalidatePath("/buzz-cafe");
   revalidatePath("/admin");
   return { success: true, message: "Product removed." };
 }
