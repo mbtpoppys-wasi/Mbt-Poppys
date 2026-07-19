@@ -152,7 +152,14 @@ export default function CafeSectionClient({ products }: { products: CafeProduct[
                     {CATEGORY_LABELS[product.category]}
                   </p>
                 )}
-                <h3 className="font-display text-lg font-bold text-white">{product.name}</h3>
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="font-display text-lg font-bold text-white">{product.name}</h3>
+                  {product.price != null && (
+                    <span className="flex-shrink-0 font-display text-lg font-black text-mbtYellow">
+                      R {Number(product.price).toFixed(2)}
+                    </span>
+                  )}
+                </div>
                 {product.description && (
                   <p className="mt-2 text-sm text-white/60">{product.description}</p>
                 )}

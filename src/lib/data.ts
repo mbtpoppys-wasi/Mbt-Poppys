@@ -1,5 +1,6 @@
 import { createServerClient } from "@/lib/supabase/server";
 import type {
+  CafeGalleryImage,
   CafeProduct,
   FuelAnnouncement,
   FuelPrice,
@@ -43,6 +44,21 @@ export async function getCafeProducts(): Promise<CafeProduct[]> {
 
     if (error || !data) return [];
     return data as CafeProduct[];
+  } catch {
+    return [];
+  }
+}
+
+export async function getCafeGalleryImages(): Promise<CafeGalleryImage[]> {
+  try {
+    const supabase = createServerClient();
+    const { data, error } = await supabase
+      .from("cafe_gallery")
+      .select("*")
+      .order("sort_order", { ascending: true });
+
+    if (error || !data) return [];
+    return data as CafeGalleryImage[];
   } catch {
     return [];
   }

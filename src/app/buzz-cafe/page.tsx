@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
+import ClickableImage from "@/components/ClickableImage";
 import CafeSectionClient from "@/components/CafeSectionClient";
-import { getCafeProducts } from "@/lib/data";
+import { getCafeGalleryImages, getCafeProducts } from "@/lib/data";
+import { getStoragePhotoUrl } from "@/lib/storage-url";
 
 export const metadata: Metadata = {
   title: "BUZZ Café Menu",
@@ -17,7 +19,10 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function BuzzCafePage() {
-  const products = await getCafeProducts();
+  const [products, galleryImages] = await Promise.all([
+    getCafeProducts(),
+    getCafeGalleryImages(),
+  ]);
 
   return (
     <>
@@ -44,6 +49,36 @@ export default async function BuzzCafePage() {
               🍿 Ask about free popcorn on big fill-ups
             </p>
           </Reveal>
+
+          {/* In-store shelf photos come first — tap any photo to view full size */}
+          {galleryImages.length > 0 && (
+            <div className="mb-16">
+              <Reveal className="mb-6 text-center">
+                <h2 className="font-display text-xl font-bold uppercase tracking-wide text-white">
+                  Inside The <span className="text-mbtYellow">Store</span>
+                </h2>
+                <p className="mt-2 text-sm text-white/50">
+                  Tap a photo to see it full size.
+                </p>
+              </Reveal>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                {galleryImages.map((img, index) => (
+                  <Reveal
+                    key={img.id}
+                    delay={index * 40}
+                    className="relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-mbtCard"
+                  >
+                    <ClickableImage
+                      src={getStoragePhotoUrl(img.filename)}
+                      alt={img.caption || "Inside the BUZZ Café convenience store at MBT Poppys Ventersdorp"}
+                      sizes="(max-width: 640px) 50vw, 25vw"
+                      caption={img.caption || undefined}
+                    />
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          )}
 
           <CafeSectionClient products={products} />
         </div>

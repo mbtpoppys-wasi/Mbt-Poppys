@@ -11,6 +11,7 @@ const LIVE_TABLES = [
   "fuel_prices",
   "status_banner",
   "cafe_products",
+  "cafe_gallery",
   "gallery_images",
   "specials",
   "fuel_announcements",

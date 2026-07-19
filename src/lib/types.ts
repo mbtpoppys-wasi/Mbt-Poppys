@@ -26,10 +26,19 @@ export interface CafeProduct {
   category: CafeCategory;
   name: string;
   description: string;
+  price: number | null; // null = no price shown (tag not visible on shelf)
   sort_order: number;
   status: CafeProductStatus;
   is_best_price: boolean;
   image_filename: string | null;
+}
+
+// In-store shelf photos shown at the top of /buzz-cafe
+export interface CafeGalleryImage {
+  id: string;
+  filename: string;
+  caption: string;
+  sort_order: number;
 }
 
 export interface GalleryImage {

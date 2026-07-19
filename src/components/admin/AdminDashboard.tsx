@@ -12,6 +12,7 @@ import {
   Coffee,
   Copy,
   Fuel,
+  Images,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -24,13 +25,16 @@ import {
   X,
 } from "lucide-react";
 import {
+  addCafeGalleryImageAction,
   addCafeProductAction,
   addFuelAnnouncementAction,
   addSpecialAction,
+  deleteCafeGalleryImageAction,
   deleteCafeProductAction,
   deleteFuelAnnouncementAction,
   deleteSpecialAction,
   logoutAction,
+  moveCafeGalleryImageAction,
   moveSpecialAction,
   toggleFuelAnnouncementAction,
   toggleSpecialAction,
@@ -46,6 +50,7 @@ import { MASTER_PROMPT, PROMPT_CATEGORIES, TOTAL_PROMPTS, buildPrompt } from "@/
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import type {
   CafeCategory,
+  CafeGalleryImage,
   CafeProduct,
   CafeProductStatus,
   FuelAnnouncement,
@@ -107,7 +112,15 @@ const STATUS_META: Record<CafeProductStatus, { label: string; className: string 
   temporarily_removed: { label: "Removed", className: "bg-gray-200 text-gray-600" },
 };
 
-type SectionId = "overview" | "fuel" | "banner" | "cafe" | "specials" | "updates" | "prompts";
+type SectionId =
+  | "overview"
+  | "fuel"
+  | "banner"
+  | "cafe"
+  | "cafe-photos"
+  | "specials"
+  | "updates"
+  | "prompts";
 
 const INACTIVITY_MS = 30 * 60 * 1000;
 
@@ -407,12 +420,14 @@ type ModalState =
   | { type: "add-special" }
   | { type: "edit-special"; special: Special }
   | { type: "edit-announcement"; announcement: FuelAnnouncement }
+  | { type: "add-cafe-photo" }
   | null;
 
 interface Props {
   fuelPrices: FuelPrice[];
   statusBanner: StatusBanner | null;
   cafeProducts: CafeProduct[];
+  cafeGallery: CafeGalleryImage[];
   specials: Special[];
   fuelAnnouncements: FuelAnnouncement[];
 }
@@ -422,6 +437,7 @@ const NAV: { id: SectionId; label: string; icon: React.ComponentType<{ size?: nu
   { id: "fuel", label: "Fuel Prices", icon: Fuel },
   { id: "banner", label: "Status Banner", icon: AlertTriangle },
   { id: "cafe", label: "BUZZ Café", icon: Coffee },
+  { id: "cafe-photos", label: "Café Photos", icon: Images },
   { id: "specials", label: "Specials", icon: BadgePercent },
   { id: "updates", label: "Fuel Updates", icon: Bell },
   { id: "prompts", label: "Image Prompts", icon: Wand2 },
@@ -433,6 +449,7 @@ export default function AdminDashboard(props: Props) {
   );
   const [banner, setBanner] = useState<StatusBanner | null>(props.statusBanner);
   const [products, setProducts] = useState<CafeProduct[]>(props.cafeProducts);
+  const [cafePhotos, setCafePhotos] = useState<CafeGalleryImage[]>(props.cafeGallery);
   const [specials, setSpecials] = useState<Special[]>(props.specials);
   const [announcements, setAnnouncements] = useState<FuelAnnouncement[]>(props.fuelAnnouncements);
 
@@ -443,6 +460,7 @@ export default function AdminDashboard(props: Props) {
   }, [props.fuelPrices]);
   useEffect(() => setBanner(props.statusBanner), [props.statusBanner]);
   useEffect(() => setProducts(props.cafeProducts), [props.cafeProducts]);
+  useEffect(() => setCafePhotos(props.cafeGallery), [props.cafeGallery]);
   useEffect(() => setSpecials(props.specials), [props.specials]);
   useEffect(() => setAnnouncements(props.fuelAnnouncements), [props.fuelAnnouncements]);
 
@@ -523,6 +541,7 @@ export default function AdminDashboard(props: Props) {
 
   const addTargets: Partial<Record<SectionId, ModalState>> = {
     specials: { type: "add-special" },
+    "cafe-photos": { type: "add-cafe-photo" },
   };
   const addModalForSection: ModalState = addTargets[section] ?? { type: "add-product" };
 
@@ -613,6 +632,40 @@ export default function AdminDashboard(props: Props) {
       return;
     }
     setSpecials((prev) => prev.filter((x) => x.id !== s.id));
+    flashSaved();
+  };
+
+  const deleteCafePhoto = async (img: CafeGalleryImage) => {
+    const res = await runAction(deleteCafeGalleryImageAction, { id: img.id, filename: img.filename });
+    if (!res.success) {
+      alert("Delete failed: " + res.message);
+      return;
+    }
+    setCafePhotos((prev) => prev.filter((x) => x.id !== img.id));
+    flashSaved();
+  };
+
+  const moveCafePhoto = async (img: CafeGalleryImage, direction: "up" | "down") => {
+    const res = await runAction(moveCafeGalleryImageAction, { id: img.id, direction });
+    if (!res.success) {
+      alert("Reorder failed: " + res.message);
+      return;
+    }
+    setCafePhotos((prev) => {
+      const sorted = [...prev].sort((a, b) => a.sort_order - b.sort_order);
+      const i = sorted.findIndex((x) => x.id === img.id);
+      const j = direction === "up" ? i - 1 : i + 1;
+      if (i === -1 || j < 0 || j >= sorted.length) return prev;
+      const a = sorted[i];
+      const b = sorted[j];
+      return prev.map((x) =>
+        x.id === a.id
+          ? { ...x, sort_order: b.sort_order }
+          : x.id === b.id
+            ? { ...x, sort_order: a.sort_order }
+            : x
+      );
+    });
     flashSaved();
   };
 
@@ -762,6 +815,7 @@ export default function AdminDashboard(props: Props) {
               const counts: Partial<Record<SectionId, number>> = {
                 fuel: fuel.length,
                 cafe: products.length,
+                "cafe-photos": cafePhotos.length,
                 specials: specials.length,
                 updates: announcements.length,
                 prompts: TOTAL_PROMPTS,
@@ -1004,6 +1058,11 @@ export default function AdminDashboard(props: Props) {
                                   <p className="truncate text-xs text-mbtDark">{p.description}</p>
                                 )}
                               </div>
+                              {p.price != null && (
+                                <span className="flex-shrink-0 font-display text-sm font-bold text-mbtDark">
+                                  {formatRand(Number(p.price))}
+                                </span>
+                              )}
                               <span
                                 className={`hidden flex-shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold sm:inline ${STATUS_META[p.status].className}`}
                               >
@@ -1025,6 +1084,66 @@ export default function AdminDashboard(props: Props) {
                     </p>
                   )}
                 </div>
+              </SectionCard>
+            )}
+
+            {/* ── Café shelf photos ── */}
+            {showSection("cafe-photos") && !query && (
+              <SectionCard
+                icon={Images}
+                title="Café Photos"
+                subtitle="Shelf & store photos shown at the top of the BUZZ Café page"
+                count={cafePhotos.length}
+              >
+                {(() => {
+                  const sortedPhotos = [...cafePhotos].sort((a, b) => a.sort_order - b.sort_order);
+                  return (
+                    <div className="divide-y divide-mbtDark rounded-xl border border-mbtDark">
+                      {sortedPhotos.map((img, i) => (
+                        <div key={img.id} className="flex items-center gap-3 px-3 py-2.5">
+                          <span className="flex flex-shrink-0 flex-col">
+                            <button
+                              type="button"
+                              disabled={i === 0}
+                              onClick={() => moveCafePhoto(img, "up")}
+                              aria-label="Move up"
+                              className="text-mbtDark transition hover:text-mbtDark disabled:opacity-20"
+                            >
+                              <ChevronUp size={15} />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={i === sortedPhotos.length - 1}
+                              onClick={() => moveCafePhoto(img, "down")}
+                              aria-label="Move down"
+                              className="text-mbtDark transition hover:text-mbtDark disabled:opacity-20"
+                            >
+                              <ChevronDown size={15} />
+                            </button>
+                          </span>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={getStoragePhotoUrl(img.filename)}
+                            alt={img.caption || "Café shelf photo"}
+                            className="h-12 w-12 flex-shrink-0 rounded-lg object-cover"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-semibold text-mbtDark">
+                              {img.caption || "No caption"}
+                            </p>
+                            <p className="truncate text-[11px] text-mbtDark/60">{img.filename}</p>
+                          </div>
+                          <InlineDelete onConfirm={() => deleteCafePhoto(img)} />
+                        </div>
+                      ))}
+                      {sortedPhotos.length === 0 && (
+                        <p className="py-4 text-center text-sm text-mbtDark">
+                          No photos yet — tap Add to upload your store photos.
+                        </p>
+                      )}
+                    </div>
+                  );
+                })()}
               </SectionCard>
             )}
 
@@ -1277,6 +1396,19 @@ export default function AdminDashboard(props: Props) {
           </ModalShell>
         )}
 
+        {modal?.type === "add-cafe-photo" && (
+          <ModalShell key="add-cafe-photo" title="Upload Café Photo" onClose={() => setModal(null)}>
+            <CafePhotoAddForm
+              nextSortOrder={cafePhotos.length}
+              onDone={(saved) => {
+                setCafePhotos((prev) => [...prev, saved]);
+                flashSaved();
+                setModal(null);
+              }}
+            />
+          </ModalShell>
+        )}
+
         {modal?.type === "edit-announcement" && (
           <ModalShell key="edit-announcement" title="Edit Announcement" onClose={() => setModal(null)}>
             <AnnouncementEditForm
@@ -1391,6 +1523,7 @@ function ProductForm({
   const [category, setCategory] = useState<CafeCategory>(product?.category ?? "fresh_bakery");
   const [name, setName] = useState(product?.name ?? "");
   const [description, setDescription] = useState(product?.description ?? "");
+  const [price, setPrice] = useState(product?.price != null ? String(product.price) : "");
   const [status, setStatus] = useState<CafeProductStatus>(product?.status ?? "available");
   const [isBestPrice, setIsBestPrice] = useState(product?.is_best_price ?? false);
   const [file, setFile] = useState<File | null>(null);
@@ -1412,6 +1545,7 @@ function ProductForm({
           category,
           name: name.trim(),
           description: description.trim(),
+          price: price.trim(),
           sort_order: String(product?.sort_order ?? 0),
         };
         if (file) fields.image = file;
@@ -1442,6 +1576,7 @@ function ProductForm({
               category,
               name: name.trim(),
               description: description.trim(),
+              price: price.trim() ? Number(price) : null,
               status,
               is_best_price: isBestPrice,
               // if a new file was uploaded the exact filename is generated
@@ -1488,6 +1623,19 @@ function ProductForm({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Short description shown under the name"
+          className={inputClass}
+        />
+      </label>
+
+      <label className="block">
+        <span className={labelClass}>Price (R) — optional</span>
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          placeholder="Leave blank to show no price"
           className={inputClass}
         />
       </label>
@@ -1649,6 +1797,69 @@ function SpecialForm({
         disabled={Boolean(file) && !sizeAck}
         label={isNew ? "Add Special" : "Save Changes"}
       />
+    </form>
+  );
+}
+
+function CafePhotoAddForm({
+  nextSortOrder,
+  onDone,
+}: {
+  nextSortOrder: number;
+  onDone: (saved: CafeGalleryImage) => void;
+}) {
+  const [file, setFile] = useState<File | null>(null);
+  const [caption, setCaption] = useState("");
+  const [pending, setPending] = useState(false);
+
+  return (
+    <form
+      onSubmit={async (e) => {
+        e.preventDefault();
+        if (!file) {
+          alert("Please choose a photo to upload.");
+          return;
+        }
+        setPending(true);
+        const res = await runAction(addCafeGalleryImageAction, {
+          file,
+          caption: caption.trim(),
+          sort_order: String(nextSortOrder),
+        });
+        setPending(false);
+        if (!res.success) {
+          alert("Upload failed: " + res.message);
+          return;
+        }
+        const row = res.row as unknown as CafeGalleryImage | undefined;
+        if (row) onDone(row);
+      }}
+      className="space-y-4"
+    >
+      <label className="block">
+        <span className={labelClass}>Photo</span>
+        <input
+          type="file"
+          required
+          accept="image/*"
+          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          className={`${inputClass} file:mr-3 file:rounded-full file:border-0 file:bg-mbtYellow file:px-3 file:py-1 file:text-xs file:font-bold file:text-mbtDark`}
+        />
+        <span className="mt-1.5 block text-[11px] text-mbtDark/70">
+          Any size works here — store photos open full size when visitors tap them.
+        </span>
+      </label>
+      <label className="block">
+        <span className={labelClass}>Caption (optional)</span>
+        <input
+          type="text"
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          placeholder="e.g. Energy drinks fridge"
+          className={inputClass}
+        />
+      </label>
+      <SubmitRow pending={pending} label="Upload Photo" />
     </form>
   );
 }

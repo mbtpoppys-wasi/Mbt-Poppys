@@ -98,15 +98,27 @@ export async function updateStatusBannerAction(_prevState: ActionResult, formDat
   return { success: true, message: "Banner updated." };
 }
 
+// "" → null (no price shown), otherwise a valid non-negative number or an error.
+function parseOptionalPrice(raw: FormDataEntryValue | null): number | null | "invalid" {
+  const text = String(raw ?? "").trim();
+  if (!text) return null;
+  const value = Number(text);
+  if (!Number.isFinite(value) || value < 0) return "invalid";
+  return value;
+}
+
 export async function addCafeProductAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
   await requireAdmin();
 
   const category = String(formData.get("category") ?? "") as CafeCategory;
   const name = String(formData.get("name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const price = parseOptionalPrice(formData.get("price"));
   const sortOrder = Number(formData.get("sort_order") ?? 0);
   const isBestPrice = formData.get("is_best_price") === "on";
   const file = formData.get("image");
+
+  if (price === "invalid") return { success: false, message: "Enter a valid price (or leave it blank)." };
 
   if (
     !["fresh_bakery", "cold_drinks", "travel_snacks", "tobacco_vapes", "braai_outdoor", "essentials"].includes(
@@ -137,6 +149,7 @@ export async function addCafeProductAction(_prevState: ActionResult, formData: F
       category,
       name,
       description,
+      price,
       sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
       is_best_price: isBestPrice,
       image_filename: imageFilename,
@@ -203,8 +216,11 @@ export async function updateCafeProductAction(_prevState: ActionResult, formData
   const category = String(formData.get("category") ?? "") as CafeCategory;
   const name = String(formData.get("name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const price = parseOptionalPrice(formData.get("price"));
   const sortOrder = Number(formData.get("sort_order") ?? 0);
   const status = String(formData.get("status") ?? "available") as CafeProductStatus;
+
+  if (price === "invalid") return { success: false, message: "Enter a valid price (or leave it blank)." };
   const isBestPrice = formData.get("is_best_price") === "on" || formData.get("is_best_price") === "true";
   const currentImage = String(formData.get("current_image") ?? "");
   const file = formData.get("image");
@@ -244,6 +260,7 @@ export async function updateCafeProductAction(_prevState: ActionResult, formData
       category,
       name,
       description,
+      price,
       sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
       status,
       is_best_price: isBestPrice,
@@ -291,6 +308,107 @@ function slugifyFilename(businessSlug: string, alt: string, originalName: string
     .slice(0, 60);
   const unique = Date.now().toString(36);
   return `${businessSlug}-${descriptor}-${unique}.${ext}`;
+}
+
+// ── BUZZ Café shelf-photo gallery (shown at the top of /buzz-cafe) ──────────
+
+export async function addCafeGalleryImageAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdmin();
+
+  const file = formData.get("file");
+  const caption = String(formData.get("caption") ?? "").trim();
+  const sortOrder = Number(formData.get("sort_order") ?? 0);
+
+  if (!(file instanceof File) || file.size === 0) {
+    return { success: false, message: "Please choose a photo to upload." };
+  }
+
+  const filename = slugifyFilename("buzz-cafe", caption || "shelf-photo", file.name);
+  const supabase = createServiceRoleClient();
+
+  const { error: uploadError } = await supabase.storage
+    .from("station-photos")
+    .upload(filename, await file.arrayBuffer(), {
+      contentType: file.type || "image/jpeg",
+      upsert: false,
+    });
+
+  if (uploadError) return { success: false, message: uploadError.message };
+
+  const { data, error: insertError } = await supabase
+    .from("cafe_gallery")
+    .insert({
+      filename,
+      caption,
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
+    })
+    .select("*")
+    .single();
+
+  if (insertError) return { success: false, message: insertError.message };
+
+  revalidatePath("/buzz-cafe");
+  revalidatePath("/admin");
+  return { success: true, message: "Photo uploaded.", row: data ?? undefined };
+}
+
+export async function moveCafeGalleryImageAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdmin();
+
+  const id = String(formData.get("id") ?? "");
+  const direction = String(formData.get("direction") ?? "");
+  if (!id || (direction !== "up" && direction !== "down")) {
+    return { success: false, message: "Invalid move." };
+  }
+
+  const supabase = createServiceRoleClient();
+  const { data: all, error: fetchError } = await supabase
+    .from("cafe_gallery")
+    .select("id, sort_order")
+    .order("sort_order", { ascending: true });
+
+  if (fetchError || !all) return { success: false, message: fetchError?.message ?? "Could not load photos." };
+
+  const index = all.findIndex((row) => row.id === id);
+  const swapIndex = direction === "up" ? index - 1 : index + 1;
+  if (index === -1 || swapIndex < 0 || swapIndex >= all.length) {
+    return { success: true, message: "" };
+  }
+
+  const current = all[index];
+  const swap = all[swapIndex];
+
+  const [{ error: e1 }, { error: e2 }] = await Promise.all([
+    supabase.from("cafe_gallery").update({ sort_order: swap.sort_order }).eq("id", current.id),
+    supabase.from("cafe_gallery").update({ sort_order: current.sort_order }).eq("id", swap.id),
+  ]);
+
+  if (e1 || e2) return { success: false, message: (e1 ?? e2)?.message ?? "Reorder failed." };
+
+  revalidatePath("/buzz-cafe");
+  revalidatePath("/admin");
+  return { success: true, message: "Reordered." };
+}
+
+export async function deleteCafeGalleryImageAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdmin();
+
+  const id = String(formData.get("id") ?? "");
+  const filename = String(formData.get("filename") ?? "");
+  if (!id) return { success: false, message: "Missing photo id." };
+
+  const supabase = createServiceRoleClient();
+
+  if (filename) {
+    await supabase.storage.from("station-photos").remove([filename]);
+  }
+
+  const { error } = await supabase.from("cafe_gallery").delete().eq("id", id);
+  if (error) return { success: false, message: error.message };
+
+  revalidatePath("/buzz-cafe");
+  revalidatePath("/admin");
+  return { success: true, message: "Photo removed." };
 }
 
 export async function addGalleryImageAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {

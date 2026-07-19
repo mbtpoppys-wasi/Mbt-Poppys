@@ -3,6 +3,7 @@ import { isAdminAuthenticated } from "@/lib/auth";
 import {
   getAllFuelAnnouncements,
   getAllSpecials,
+  getCafeGalleryImages,
   getCafeProducts,
   getFuelPrices,
   getStatusBanner,
@@ -28,11 +29,12 @@ export default async function AdminPage() {
     return <AdminLoginScreen />;
   }
 
-  const [fuelPrices, statusBanner, cafeProducts, specials, fuelAnnouncements] =
+  const [fuelPrices, statusBanner, cafeProducts, cafeGallery, specials, fuelAnnouncements] =
     await Promise.all([
       getFuelPrices(),
       getStatusBanner(),
       getCafeProducts(),
+      getCafeGalleryImages(),
       getAllSpecials(),
       getAllFuelAnnouncements(),
     ]);
@@ -42,6 +44,7 @@ export default async function AdminPage() {
       fuelPrices={fuelPrices}
       statusBanner={statusBanner}
       cafeProducts={cafeProducts}
+      cafeGallery={cafeGallery}
       specials={specials}
       fuelAnnouncements={fuelAnnouncements}
     />
