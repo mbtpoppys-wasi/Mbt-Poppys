@@ -110,7 +110,15 @@ const STATUS_META: Record<CafeProductStatus, { label: string; className: string 
   out_of_stock: { label: "Out of Stock", className: "bg-red-100 text-red-700" },
   coming_soon: { label: "Coming Soon", className: "bg-sky-100 text-sky-700" },
   temporarily_removed: { label: "Removed", className: "bg-gray-200 text-gray-600" },
+  custom: { label: "Custom", className: "bg-amber-100 text-amber-700" },
 };
+
+// The public site shows this per-item, e.g. "Fresh Daily" instead of a
+// generic label — status_text overrides the fixed STATUS_META label above
+// whenever it's set, on any status.
+function productStatusLabel(p: CafeProduct): string {
+  return p.status_text?.trim() || STATUS_META[p.status].label;
+}
 
 type SectionId =
   | "overview"
@@ -1066,7 +1074,7 @@ export default function AdminDashboard(props: Props) {
                               <span
                                 className={`hidden flex-shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold sm:inline ${STATUS_META[p.status].className}`}
                               >
-                                {STATUS_META[p.status].label}
+                                {productStatusLabel(p)}
                               </span>
                               <span className="flex flex-shrink-0 items-center gap-0.5">
                                 <EditButton onClick={() => setModal({ type: "edit-product", product: p })} />
@@ -1194,6 +1202,11 @@ export default function AdminDashboard(props: Props) {
                         <p className="truncate text-sm font-semibold text-mbtDark">{s.title}</p>
                         {s.description && (
                           <p className="truncate text-xs text-mbtDark">{s.description}</p>
+                        )}
+                        {s.status_text && (
+                          <span className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                            {s.status_text}
+                          </span>
                         )}
                       </div>
                       <Toggle on={s.is_active} onChange={() => toggleSpecial(s)} />
@@ -1525,6 +1538,7 @@ function ProductForm({
   const [description, setDescription] = useState(product?.description ?? "");
   const [price, setPrice] = useState(product?.price != null ? String(product.price) : "");
   const [status, setStatus] = useState<CafeProductStatus>(product?.status ?? "available");
+  const [statusText, setStatusText] = useState(product?.status_text ?? "");
   const [isBestPrice, setIsBestPrice] = useState(product?.is_best_price ?? false);
   const [file, setFile] = useState<File | null>(null);
   const [sizeAck, setSizeAck] = useState(false);
@@ -1546,6 +1560,7 @@ function ProductForm({
           name: name.trim(),
           description: description.trim(),
           price: price.trim(),
+          status_text: statusText.trim(),
           sort_order: String(product?.sort_order ?? 0),
         };
         if (file) fields.image = file;
@@ -1578,6 +1593,7 @@ function ProductForm({
               description: description.trim(),
               price: price.trim() ? Number(price) : null,
               status,
+              status_text: statusText.trim() || null,
               is_best_price: isBestPrice,
               // if a new file was uploaded the exact filename is generated
               // server-side; props re-sync will correct it moments later
@@ -1657,6 +1673,21 @@ function ProductForm({
         </label>
       )}
 
+      <label className="block">
+        <span className={labelClass}>Status text (optional)</span>
+        <input
+          type="text"
+          value={statusText}
+          onChange={(e) => setStatusText(e.target.value)}
+          placeholder="e.g. Fresh Daily, Baked This Morning, Never Returning, Back 07/02/26"
+          className={inputClass}
+        />
+        <span className="mt-1.5 block text-[11px] text-mbtDark/70">
+          Shown on the website in place of the default label (e.g. &ldquo;Available 24/7&rdquo;).
+          Leave blank to use the default for this item&rsquo;s status.
+        </span>
+      </label>
+
       <label className="flex items-center gap-2 text-sm text-mbtDark">
         <input
           type="checkbox"
@@ -1704,6 +1735,7 @@ function SpecialForm({
 }) {
   const [title, setTitle] = useState(special?.title ?? "");
   const [description, setDescription] = useState(special?.description ?? "");
+  const [statusText, setStatusText] = useState(special?.status_text ?? "");
   const [file, setFile] = useState<File | null>(null);
   const [sizeAck, setSizeAck] = useState(false);
   const [pending, setPending] = useState(false);
@@ -1722,6 +1754,7 @@ function SpecialForm({
         const fields: Record<string, string | File> = {
           title: title.trim(),
           description: description.trim(),
+          status_text: statusText.trim(),
         };
         if (file) fields.image = file;
 
@@ -1749,6 +1782,7 @@ function SpecialForm({
               ...special,
               title: title.trim(),
               description: description.trim(),
+              status_text: statusText.trim() || null,
               updated_at: new Date().toISOString(),
             },
             false
@@ -1778,6 +1812,22 @@ function SpecialForm({
           placeholder="What's the deal?"
           className={inputClass}
         />
+      </label>
+
+      <label className="block">
+        <span className={labelClass}>Status text (optional)</span>
+        <input
+          type="text"
+          value={statusText}
+          onChange={(e) => setStatusText(e.target.value)}
+          placeholder="e.g. Never Returning, Returning 07/02/26"
+          className={inputClass}
+        />
+        <span className="mt-1.5 block text-[11px] text-mbtDark/70">
+          If you turn this special off below, it normally disappears from the website. Fill this
+          in and it stays visible (dimmed) with this message instead — handy for
+          &ldquo;returning soon&rdquo; or &ldquo;gone for good&rdquo; specials.
+        </span>
       </label>
 
       <label className="block">

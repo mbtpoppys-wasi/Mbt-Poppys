@@ -22,11 +22,29 @@ const CATEGORY_ORDER: Record<CafeCategory, number> = Object.fromEntries(
   CATEGORY_TABS.map((t, i) => [t.key, i])
 ) as Record<CafeCategory, number>;
 
+// "available" renders as a pulsing dot instead of a bordered badge — see
+// resolveAvailability() below, which also lets status_text override any of
+// these defaults so every item can say something different (set in the
+// admin's "Status text" field, e.g. "Fresh Daily", "Baked This Morning").
 const STATUS_BADGE: Record<string, { label: string; className: string } | null> = {
   available: null,
   out_of_stock: { label: "Out of Stock", className: "bg-red-500/15 text-red-400 border-red-500/30" },
   coming_soon: { label: "Coming Soon", className: "bg-sky-500/15 text-sky-400 border-sky-500/30" },
+  custom: { label: "Update", className: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
 };
+
+type Availability =
+  | { kind: "dot"; label: string }
+  | { kind: "badge"; label: string; className: string };
+
+function resolveAvailability(product: CafeProduct): Availability {
+  const customText = product.status_text?.trim();
+  if (product.status === "available") {
+    return { kind: "dot", label: customText || "Available 24/7" };
+  }
+  const fallback = STATUS_BADGE[product.status] ?? STATUS_BADGE.custom!;
+  return { kind: "badge", label: customText || fallback.label, className: fallback.className };
+}
 
 type ActiveTab = CafeCategory | "all";
 
@@ -108,8 +126,8 @@ export default function CafeSectionClient({ products }: { products: CafeProduct[
           </p>
         )}
         {filtered.map((product, index) => {
-          const statusBadge = STATUS_BADGE[product.status];
-          const dimmed = product.status === "out_of_stock";
+          const availability = resolveAvailability(product);
+          const dimmed = product.status === "out_of_stock" || product.status === "custom";
 
           return (
             <div
@@ -165,11 +183,11 @@ export default function CafeSectionClient({ products }: { products: CafeProduct[
                 )}
 
                 <div className="mt-4 flex flex-wrap items-center gap-2">
-                  {statusBadge ? (
+                  {availability.kind === "badge" ? (
                     <span
-                      className={`rounded-full border px-3 py-1 font-display text-[10px] font-bold uppercase tracking-wide ${statusBadge.className}`}
+                      className={`rounded-full border px-3 py-1 font-display text-[10px] font-bold uppercase tracking-wide ${availability.className}`}
                     >
-                      {statusBadge.label}
+                      {availability.label}
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
@@ -178,7 +196,7 @@ export default function CafeSectionClient({ products }: { products: CafeProduct[
                         <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-400" />
                       </span>
                       <span className="font-display text-[10px] font-bold uppercase tracking-wide text-amber-400">
-                        Available 24/7
+                        {availability.label}
                       </span>
                     </span>
                   )}

@@ -43,7 +43,9 @@ export default async function SpecialsPage() {
               <Reveal
                 key={special.id}
                 delay={index * 80}
-                className="overflow-hidden rounded-2xl border border-white/10 bg-mbtCard transition duration-300 hover:-translate-y-1 hover:border-mbtYellow/40"
+                className={`overflow-hidden rounded-2xl border border-white/10 bg-mbtCard transition duration-300 hover:-translate-y-1 hover:border-mbtYellow/40 ${
+                  special.is_active ? "" : "opacity-60"
+                }`}
               >
                 {special.image_filename && (
                   // Locked to 16:9 so a 1920×1080 upload displays with zero
@@ -60,9 +62,18 @@ export default async function SpecialsPage() {
                   </div>
                 )}
                 <div className="p-8">
-                  <span className="inline-block rounded-full bg-mbtYellow/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-mbtYellow">
-                    Special
-                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {special.is_active && (
+                      <span className="inline-block rounded-full bg-mbtYellow/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-mbtYellow">
+                        Special
+                      </span>
+                    )}
+                    {special.status_text && (
+                      <span className="inline-block rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/70">
+                        {special.status_text}
+                      </span>
+                    )}
+                  </div>
                   <h2 className="mt-4 font-display text-2xl font-bold text-white">
                     {special.title}
                   </h2>

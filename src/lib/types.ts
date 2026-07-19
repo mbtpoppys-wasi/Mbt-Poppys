@@ -19,7 +19,8 @@ export type CafeProductStatus =
   | "available"
   | "out_of_stock"
   | "coming_soon"
-  | "temporarily_removed";
+  | "temporarily_removed"
+  | "custom";
 
 export interface CafeProduct {
   id: string;
@@ -29,6 +30,7 @@ export interface CafeProduct {
   price: number | null; // null = no price shown (tag not visible on shelf)
   sort_order: number;
   status: CafeProductStatus;
+  status_text: string | null; // overrides the status badge/availability label when set, e.g. "Fresh Daily", "Never Returning", "Back 07/02/26"
   is_best_price: boolean;
   image_filename: string | null;
 }
@@ -62,6 +64,7 @@ export interface Special {
   description: string;
   image_filename: string | null;
   is_active: boolean;
+  status_text: string | null; // e.g. "Never Returning", "Returning 07/02/26" — keeps the special visible (dimmed) even when is_active is false
   sort_order: number;
   created_at: string;
   updated_at: string;

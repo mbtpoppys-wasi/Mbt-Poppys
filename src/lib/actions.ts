@@ -6,7 +6,7 @@ import { checkAdminCredentials, clearAdminSession, isAdminAuthenticated, setAdmi
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import type { CafeCategory, CafeProductStatus, FuelType } from "@/lib/types";
 
-const CAFE_STATUSES = ["available", "out_of_stock", "coming_soon", "temporarily_removed"];
+const CAFE_STATUSES = ["available", "out_of_stock", "coming_soon", "temporarily_removed", "custom"];
 
 // `ts` marks each result as distinct so the login screen's client-side
 // rate limiter can count repeated identical failures. `row` carries the
@@ -116,6 +116,7 @@ export async function addCafeProductAction(_prevState: ActionResult, formData: F
   const price = parseOptionalPrice(formData.get("price"));
   const sortOrder = Number(formData.get("sort_order") ?? 0);
   const isBestPrice = formData.get("is_best_price") === "on";
+  const statusText = String(formData.get("status_text") ?? "").trim() || null;
   const file = formData.get("image");
 
   if (price === "invalid") return { success: false, message: "Enter a valid price (or leave it blank)." };
@@ -152,6 +153,7 @@ export async function addCafeProductAction(_prevState: ActionResult, formData: F
       price,
       sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
       is_best_price: isBestPrice,
+      status_text: statusText,
       image_filename: imageFilename,
     })
     .select("*")
@@ -219,6 +221,7 @@ export async function updateCafeProductAction(_prevState: ActionResult, formData
   const price = parseOptionalPrice(formData.get("price"));
   const sortOrder = Number(formData.get("sort_order") ?? 0);
   const status = String(formData.get("status") ?? "available") as CafeProductStatus;
+  const statusText = String(formData.get("status_text") ?? "").trim() || null;
 
   if (price === "invalid") return { success: false, message: "Enter a valid price (or leave it blank)." };
   const isBestPrice = formData.get("is_best_price") === "on" || formData.get("is_best_price") === "true";
@@ -263,6 +266,7 @@ export async function updateCafeProductAction(_prevState: ActionResult, formData
       price,
       sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
       status,
+      status_text: statusText,
       is_best_price: isBestPrice,
       image_filename: imageFilename,
     })
@@ -507,6 +511,7 @@ export async function addSpecialAction(_prevState: ActionResult, formData: FormD
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const sortOrder = Number(formData.get("sort_order") ?? 0);
+  const statusText = String(formData.get("status_text") ?? "").trim() || null;
   const file = formData.get("image");
 
   if (!title) return { success: false, message: "Title is required." };
@@ -531,6 +536,7 @@ export async function addSpecialAction(_prevState: ActionResult, formData: FormD
       title,
       description,
       sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
+      status_text: statusText,
       image_filename: imageFilename,
     })
     .select("*")
@@ -549,6 +555,7 @@ export async function updateSpecialAction(_prevState: ActionResult, formData: Fo
   const id = String(formData.get("id") ?? "");
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const statusText = String(formData.get("status_text") ?? "").trim() || null;
   const currentImage = String(formData.get("current_image") ?? "");
   const file = formData.get("image");
 
@@ -578,6 +585,7 @@ export async function updateSpecialAction(_prevState: ActionResult, formData: Fo
     .update({
       title,
       description,
+      status_text: statusText,
       image_filename: imageFilename,
       updated_at: new Date().toISOString(),
     })

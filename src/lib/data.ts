@@ -87,11 +87,13 @@ export async function getActiveSpecials(): Promise<Special[]> {
     const { data, error } = await supabase
       .from("specials")
       .select("*")
-      .eq("is_active", true)
       .order("sort_order", { ascending: true });
 
     if (error || !data) return [];
-    return data as Special[];
+    // Active specials show as normal; inactive ones only stay visible if the
+    // owner gave them a status_text (e.g. "Returning 07/02/26") explaining
+    // why — otherwise inactive means fully hidden, as before.
+    return (data as Special[]).filter((s) => s.is_active || Boolean(s.status_text?.trim()));
   } catch {
     return [];
   }
