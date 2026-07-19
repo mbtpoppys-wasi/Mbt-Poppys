@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 import ClickableImage from "@/components/ClickableImage";
+import ImageDisclaimer from "@/components/ImageDisclaimer";
 import CafeSectionClient from "@/components/CafeSectionClient";
 import { getCafeGalleryImages, getCafeProducts } from "@/lib/data";
 import { getStoragePhotoUrl } from "@/lib/storage-url";
@@ -81,6 +82,8 @@ export default async function BuzzCafePage() {
           )}
 
           <CafeSectionClient products={products} />
+
+          <ImageDisclaimer />
         </div>
       </main>
       <Footer />

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
+import ImageDisclaimer from "@/components/ImageDisclaimer";
 import { getActiveSpecials } from "@/lib/data";
 import { getStoragePhotoUrl } from "@/lib/storage-url";
 
@@ -86,6 +87,8 @@ export default async function SpecialsPage() {
               </Reveal>
             ))}
           </div>
+
+          <ImageDisclaimer />
         </div>
       </main>
       <Footer />
