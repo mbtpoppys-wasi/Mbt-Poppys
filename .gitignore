@@ -34,3 +34,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .claude/
+
+# owner's raw ChatGPT ad-image exports (staging area before Supabase upload
+# via /admin) — not site code, and too large to track in git history
+/Images/
