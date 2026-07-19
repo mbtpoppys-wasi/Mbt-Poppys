@@ -3,9 +3,10 @@
 export default function ImageDisclaimer() {
   return (
     <p className="mx-auto mt-12 max-w-2xl text-center text-[11px] leading-relaxed text-white/30">
-      Product images shown are for illustrative purposes only and are original artwork created
-      exclusively by Sign Hub. These images are not official brand photography and are protected
-      by copyright — unauthorised use, copying, or reproduction may result in legal action.
+      Product images shown are for illustrative purposes only. This artwork was created by Sign
+      Hub and sold exclusively to MBT Poppys Ventersdorp, who owns all rights to it. These images
+      are not official brand photography. No one else may copy, reuse, or reproduce them in any
+      form — unauthorised use will result in legal action.
     </p>
   );
 }
