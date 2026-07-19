@@ -65,7 +65,67 @@ export async function isAdminAuthenticated(): Promise<boolean> {
 
 export type AdminCredentialsCheck =
   | { ok: true }
-  | { ok: false; reason: "config" | "invalid" };
+  | { ok: false; reason: "config" | "invalid" }
+  | { ok: false; reason: "locked"; retryAfterSeconds: number };
+
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_MS = 5 * 60 * 1000;
+
+// Server-side counterpart to the client-side lockout in AdminLoginScreen.tsx.
+// The client one is UX polish only (shows a countdown) and can be bypassed
+// by clearing localStorage or calling this action directly — this table is
+// the real enforcement, keyed by the email being attempted so it can't be
+// reset by the attacker.
+async function checkRateLimit(
+  supabase: ReturnType<typeof createServiceRoleClient>,
+  identifier: string
+): Promise<{ locked: true; retryAfterSeconds: number } | { locked: false }> {
+  const { data } = await supabase
+    .from("login_attempts")
+    .select("locked_until")
+    .eq("identifier", identifier)
+    .maybeSingle();
+
+  if (data?.locked_until) {
+    const remainingMs = new Date(data.locked_until).getTime() - Date.now();
+    if (remainingMs > 0) {
+      return { locked: true, retryAfterSeconds: Math.ceil(remainingMs / 1000) };
+    }
+  }
+  return { locked: false };
+}
+
+async function recordFailedAttempt(
+  supabase: ReturnType<typeof createServiceRoleClient>,
+  identifier: string
+): Promise<void> {
+  const { data } = await supabase
+    .from("login_attempts")
+    .select("failed_count")
+    .eq("identifier", identifier)
+    .maybeSingle();
+
+  const failedCount = (data?.failed_count ?? 0) + 1;
+  const lockedUntil =
+    failedCount >= MAX_FAILED_ATTEMPTS ? new Date(Date.now() + LOCKOUT_MS).toISOString() : null;
+
+  await supabase.from("login_attempts").upsert(
+    {
+      identifier,
+      failed_count: lockedUntil ? 0 : failedCount, // reset the counter once locked, so it starts fresh next window
+      locked_until: lockedUntil,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "identifier" }
+  );
+}
+
+async function clearFailedAttempts(
+  supabase: ReturnType<typeof createServiceRoleClient>,
+  identifier: string
+): Promise<void> {
+  await supabase.from("login_attempts").delete().eq("identifier", identifier);
+}
 
 // Checked against the admin_credentials table (Supabase), not env vars —
 // the row is created once via SQL editor with a bcrypt-hashed password
@@ -91,6 +151,11 @@ export async function checkAdminCredentials(
     return { ok: false, reason: "config" };
   }
 
+  const rateLimit = await checkRateLimit(supabase, normalizedEmail);
+  if (rateLimit.locked) {
+    return { ok: false, reason: "locked", retryAfterSeconds: rateLimit.retryAfterSeconds };
+  }
+
   const { data, error } = await supabase
     .from("admin_credentials")
     .select("password_hash")
@@ -101,8 +166,17 @@ export async function checkAdminCredentials(
     console.error("[admin-login] Supabase query failed:", error.message);
     return { ok: false, reason: "config" };
   }
-  if (!data) return { ok: false, reason: "invalid" };
+  if (!data) {
+    await recordFailedAttempt(supabase, normalizedEmail);
+    return { ok: false, reason: "invalid" };
+  }
 
   const matches = await bcrypt.compare(password, data.password_hash);
-  return matches ? { ok: true } : { ok: false, reason: "invalid" };
+  if (!matches) {
+    await recordFailedAttempt(supabase, normalizedEmail);
+    return { ok: false, reason: "invalid" };
+  }
+
+  await clearFailedAttempts(supabase, normalizedEmail);
+  return { ok: true };
 }

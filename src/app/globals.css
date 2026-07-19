@@ -6,6 +6,21 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Removes the mobile browser tap-highlight flash and the ~300ms tap delay /
+   double-tap-to-zoom gesture on interactive elements. Buttons and links
+   otherwise wait for the browser to rule out a double-tap-zoom gesture
+   before firing click on some Android/iOS builds, which reads as needing to
+   tap twice. Pinch-zoom on the page itself is unaffected — this only
+   changes gesture handling on the element itself. */
+button,
+a,
+[role="button"],
+input[type="submit"],
+input[type="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   background-color: #151515;
   color: #f5f5f5;

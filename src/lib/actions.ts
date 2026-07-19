@@ -8,6 +8,25 @@ import type { CafeCategory, CafeProductStatus, FuelType } from "@/lib/types";
 
 const CAFE_STATUSES = ["available", "out_of_stock", "coming_soon", "temporarily_removed", "custom"];
 
+// Every image upload goes through this before touching Supabase Storage.
+// The browser's declared file.type is untrustworthy on its own (previously
+// passed straight through as the storage contentType with no server-side
+// check at all), so this rejects anything outside a plain image allowlist
+// and caps size to stop the public bucket being used to host arbitrary or
+// oversized files.
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8MB
+
+function validateImageFile(file: File): string | null {
+  if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+    return "Please upload a JPEG, PNG, WEBP or GIF image.";
+  }
+  if (file.size > MAX_IMAGE_BYTES) {
+    return "Image is too large — please keep uploads under 8MB.";
+  }
+  return null;
+}
+
 // `ts` marks each result as distinct so the login screen's client-side
 // rate limiter can count repeated identical failures. `row` carries the
 // inserted record back so the dashboard can add it to local state with
@@ -29,6 +48,15 @@ export async function loginAction(_prevState: ActionResult, formData: FormData):
       return {
         success: false,
         message: "Server can't reach the database — check SUPABASE_SERVICE_ROLE_KEY in Vercel.",
+        ts: Date.now(),
+      };
+    }
+    if (check.reason === "locked") {
+      const mins = Math.floor(check.retryAfterSeconds / 60);
+      const secs = check.retryAfterSeconds % 60;
+      return {
+        success: false,
+        message: `Too many failed attempts. Try again in ${mins}:${String(secs).padStart(2, "0")}.`,
         ts: Date.now(),
       };
     }
@@ -134,6 +162,8 @@ export async function addCafeProductAction(_prevState: ActionResult, formData: F
 
   let imageFilename: string | null = null;
   if (file instanceof File && file.size > 0) {
+    const validationError = validateImageFile(file);
+    if (validationError) return { success: false, message: validationError };
     imageFilename = slugifyFilename("cafe-product", name, file.name);
     const { error: uploadError } = await supabase.storage
       .from("station-photos")
@@ -243,6 +273,8 @@ export async function updateCafeProductAction(_prevState: ActionResult, formData
 
   let imageFilename: string | null = currentImage || null;
   if (file instanceof File && file.size > 0) {
+    const validationError = validateImageFile(file);
+    if (validationError) return { success: false, message: validationError };
     const newFilename = slugifyFilename("cafe-product", name, file.name);
     const { error: uploadError } = await supabase.storage
       .from("station-photos")
@@ -326,6 +358,8 @@ export async function addCafeGalleryImageAction(_prevState: ActionResult, formDa
   if (!(file instanceof File) || file.size === 0) {
     return { success: false, message: "Please choose a photo to upload." };
   }
+  const validationError = validateImageFile(file);
+  if (validationError) return { success: false, message: validationError };
 
   const filename = slugifyFilename("buzz-cafe", caption || "shelf-photo", file.name);
   const supabase = createServiceRoleClient();
@@ -426,6 +460,8 @@ export async function addGalleryImageAction(_prevState: ActionResult, formData: 
   if (!(file instanceof File) || file.size === 0) {
     return { success: false, message: "Please choose a photo to upload." };
   }
+  const validationError = validateImageFile(file);
+  if (validationError) return { success: false, message: validationError };
   if (!altText) {
     return { success: false, message: "Alt text is required for SEO and accessibility." };
   }
@@ -520,6 +556,8 @@ export async function addSpecialAction(_prevState: ActionResult, formData: FormD
 
   let imageFilename: string | null = null;
   if (file instanceof File && file.size > 0) {
+    const validationError = validateImageFile(file);
+    if (validationError) return { success: false, message: validationError };
     imageFilename = slugifyFilename("special", title, file.name);
     const { error: uploadError } = await supabase.storage
       .from("station-photos")
@@ -566,6 +604,8 @@ export async function updateSpecialAction(_prevState: ActionResult, formData: Fo
 
   let imageFilename: string | null = currentImage || null;
   if (file instanceof File && file.size > 0) {
+    const validationError = validateImageFile(file);
+    if (validationError) return { success: false, message: validationError };
     const newFilename = slugifyFilename("special", title, file.name);
     const { error: uploadError } = await supabase.storage
       .from("station-photos")

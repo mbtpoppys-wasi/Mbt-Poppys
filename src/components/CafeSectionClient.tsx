@@ -119,7 +119,13 @@ export default function CafeSectionClient({ products }: { products: CafeProduct[
         )}
       </div>
 
-      <div key={`${active}-${query}`} className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {/* No remount key here: cards are keyed by product.id below, so React
+          updates the grid in place on filter change instead of destroying
+          and rebuilding the whole subtree. Forcing a remount (the old
+          `key={active-query}`) restarted the CSS entrance animation on every
+          tap, which on mobile WebKit could stall mid-paint during the touch
+          event — the fix for the "have to tap twice" bug. */}
+      <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.length === 0 && (
           <p className="col-span-full text-center text-white/40">
             {query ? "Nothing matches your search — try another word." : "New items coming soon to this category."}
