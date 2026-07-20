@@ -26,7 +26,17 @@ export default function Footer() {
 
         <div className="flex w-full flex-col items-center justify-center gap-2 text-[10px] font-medium uppercase tracking-widest text-white/40">
           <p>&copy; {new Date().getFullYear()} All Rights Reserved</p>
-          <p>Website designed and developed by The Sign Hub</p>
+          <p>
+            Built by{" "}
+            <a
+              href="https://www.signhubsa.co.za"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-mbtYellow hover:underline"
+            >
+              SignHub
+            </a>
+          </p>
         </div>
       </div>
     </footer>

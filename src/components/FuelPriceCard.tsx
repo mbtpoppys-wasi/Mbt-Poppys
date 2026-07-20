@@ -30,13 +30,17 @@ export default function FuelPriceCard({
         } transition-colors`}
       />
 
-      {featured && (
-        <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm bg-mbtYellow px-4 py-1 font-display text-[10px] font-black uppercase tracking-widest text-mbtDark shadow-lg">
-          Premium Grade
-        </span>
-      )}
-
-      <div className={featured ? "mt-2" : ""}>
+      <div>
+        {/* In-flow badge, not absolutely positioned above the card: the
+            card itself is overflow-hidden (to clip the accent bar's corners
+            to the rounded border), so anything floating outside the card's
+            own top edge — like the old -top-3.5 placement — got silently
+            clipped down to a sliver instead of showing the label. */}
+        {featured && (
+          <span className="mb-3 inline-block whitespace-nowrap rounded-sm bg-mbtYellow px-3 py-1 font-display text-[10px] font-black uppercase tracking-widest text-mbtDark shadow-lg">
+            Premium Grade
+          </span>
+        )}
         <span className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-white/50">
           {label.kind}
         </span>

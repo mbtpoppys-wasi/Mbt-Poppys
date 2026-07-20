@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { siteConfig } from "@/lib/site-config";
 
 const NAV_LINKS = [
@@ -13,11 +14,38 @@ const NAV_LINKS = [
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Next.js only scrolls on an actual route/hash change. Clicking a nav
+  // link while already on its target page — anywhere down the page — does
+  // nothing by default, which reads as a broken link. This intercepts that
+  // case and scrolls manually instead of relying on navigation to happen.
+  function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    const [path, hash] = href.split("#");
+    const targetPath = path || "/";
+    const alreadyThere = pathname === targetPath;
+
+    if (!alreadyThere) return; // let Link navigate normally; Next scrolls to top / the hash on load
+
+    e.preventDefault();
+    setMenuOpen(false);
+
+    if (hash) {
+      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.history.replaceState(null, "", href);
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-mbtDark/95 shadow-2xl shadow-black/50 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <Link href="/" className="group flex items-center gap-3">
+        <Link
+          href="/"
+          onClick={(e) => handleNavClick(e, "/")}
+          className="group flex items-center gap-3"
+        >
           <span className="flex h-9 w-9 items-center justify-center rounded bg-mbtYellow text-mbtDark transition duration-300 group-hover:rotate-6">
             <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-mbtDark font-display text-[11px] font-black leading-none">
               M
@@ -38,6 +66,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
+              onClick={(e) => handleNavClick(e, link.href)}
               className={`font-display transition ${
                 index === 0 ? "text-mbtYellow hover:text-white" : "text-white/80 hover:text-mbtYellow"
               }`}
@@ -73,7 +102,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={() => setMenuOpen(false)}
+                onClick={(e) => handleNavClick(e, link.href)}
                 className={`border-b border-white/5 py-3 ${index === 0 ? "text-mbtYellow" : "text-white/80"}`}
               >
                 {link.label}
