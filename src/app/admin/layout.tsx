@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import AdminPwaRegister from "@/components/admin/AdminPwaRegister";
+import AdminInstallPrompt from "@/components/admin/AdminInstallPrompt";
 
 export const metadata: Metadata = {
   manifest: "/manifest-admin.webmanifest",
@@ -22,6 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <>
       <AdminPwaRegister />
+      <AdminInstallPrompt />
       {children}
     </>
   );
