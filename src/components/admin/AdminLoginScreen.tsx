@@ -141,20 +141,9 @@ export default function AdminLoginScreen() {
   );
 
   return (
-    <div className="relative flex min-h-[100dvh] overflow-hidden bg-mbtDark">
-      {/* ── Ambient background (whole page, mobile included) ─────────── */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-30"
-        style={{
-          backgroundImage: "radial-gradient(rgba(255,255,255,0.14) 1px, transparent 1px)",
-          backgroundSize: "26px 26px",
-        }}
-      />
-      <div className="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-mbtYellow/15 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 right-0 h-[28rem] w-[28rem] rounded-full bg-mbtYellow/10 blur-3xl" />
-
+    <div className="flex min-h-[100dvh] bg-mbtGray">
       {/* ── Left brand panel (desktop only) ─────────────────────────── */}
-      <div className="relative hidden w-[52%] overflow-hidden lg:block">
+      <div className="relative hidden w-[52%] overflow-hidden bg-mbtDark lg:block">
         {/* dot grid */}
         <div
           className="absolute inset-0 opacity-40"
@@ -217,7 +206,7 @@ export default function AdminLoginScreen() {
       </div>
 
       {/* ── Right form panel ─────────────────────────────────────────── */}
-      <div className="relative z-10 flex flex-1 items-center justify-center px-4 py-10 sm:px-8">
+      <div className="flex flex-1 items-center justify-center px-4 py-10 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -230,33 +219,33 @@ export default function AdminLoginScreen() {
             <img
               src="/images/MBTLogo.jpg"
               alt="MBT Poppys Ventersdorp logo"
-              className="h-12 w-12 rounded-xl object-cover shadow-led-glow"
+              className="h-12 w-12 rounded-xl object-cover"
             />
             <div>
-              <p className="font-display text-base font-bold uppercase tracking-wide text-white">
+              <p className="font-display text-base font-bold uppercase tracking-wide text-mbtDark">
                 MBT Poppys
               </p>
-              <p className="text-xs text-white/50">Owner Admin Portal</p>
+              <p className="text-xs text-mbtDark">Owner Admin Portal</p>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-10">
-            <h2 className="font-display text-2xl font-bold uppercase tracking-wide text-white">
+          <div className="rounded-3xl bg-white p-8 shadow-xl shadow-black/5 sm:p-10">
+            <h2 className="font-display text-2xl font-bold uppercase tracking-wide text-mbtDark">
               Welcome back
             </h2>
-            <p className="mt-2 text-sm text-white/50">
+            <p className="mt-2 text-sm text-mbtDark">
               Sign in with your admin email and password to manage the station.
             </p>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-4">
               <label className="block">
-                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-white/60">
+                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-mbtDark">
                   Email
                 </span>
                 <div className="relative">
                   <Mail
                     size={16}
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40"
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-mbtDark"
                   />
                   <input
                     type="email"
@@ -265,19 +254,19 @@ export default function AdminLoginScreen() {
                     placeholder="owner@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl border border-white/15 bg-black/30 py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/30 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40"
+                    className="w-full rounded-xl border border-mbtDark bg-mbtGray/60 py-3 pl-11 pr-4 text-sm text-mbtDark placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40"
                   />
                 </div>
               </label>
 
               <label className="block">
-                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-white/60">
+                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-mbtDark">
                   Password
                 </span>
                 <div className="relative">
                   <Lock
                     size={16}
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40"
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-mbtDark"
                   />
                   <input
                     type={showPassword ? "text" : "password"}
@@ -286,13 +275,13 @@ export default function AdminLoginScreen() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-white/15 bg-black/30 py-3 pl-11 pr-12 text-sm text-white placeholder:text-white/30 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40"
+                    className="w-full rounded-xl border border-mbtDark bg-mbtGray/60 py-3 pl-11 pr-12 text-sm text-mbtDark placeholder:text-mbtDark/50 focus:border-mbtYellow focus:outline-none focus:ring-2 focus:ring-mbtYellow/40"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-white/40 transition hover:bg-white/10 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-mbtDark transition hover:bg-mbtDark/5 hover:text-mbtDark"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -300,7 +289,7 @@ export default function AdminLoginScreen() {
               </label>
 
               {error && (
-                <p className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400" role="alert">
+                <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600" role="alert">
                   {error}
                 </p>
               )}
@@ -319,7 +308,7 @@ export default function AdminLoginScreen() {
             </form>
           </div>
 
-          <p className="mt-6 text-center text-xs text-white/30">
+          <p className="mt-6 text-center text-xs text-mbtDark">
             Owner access only. All changes publish to the live site immediately.
           </p>
         </motion.div>
