@@ -9,7 +9,8 @@ export const metadata: Metadata = {
     title: "MBT Admin",
   },
   icons: {
-    apple: "/icons/admin-icon-192.png",
+    icon: "/icons/admin-icon-192.png",
+    apple: "/apple-touch-icon.png",
   },
 };
 
