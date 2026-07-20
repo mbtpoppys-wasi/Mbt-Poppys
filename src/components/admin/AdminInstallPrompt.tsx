@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Download, Share, SquarePlus, X } from "lucide-react";
+import { Download, MoreVertical, Share, SquarePlus, X } from "lucide-react";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -26,18 +26,39 @@ function isIos(): boolean {
   return isAppleTouch || isIpadOs;
 }
 
+function isAndroid(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /Android/.test(navigator.userAgent);
+}
+
+// Chrome only fires `beforeinstallprompt` once ITS OWN engagement
+// heuristics are satisfied, separate from the technical installability
+// checks (manifest, service worker, HTTPS) this app already passes. A
+// brand-new domain starts with zero engagement history, so the event can
+// take a while to show up — or on some Android/Chrome builds, not fire at
+// all. Without a fallback, that left Android with literally no way to
+// install, unlike iOS which always shows manual steps. This waits briefly
+// for the real event, then degrades to manual "⋮ menu → Install app"
+// instructions instead of showing nothing.
+const ANDROID_FALLBACK_MS = 2500;
+
 export default function AdminInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [showIosSteps, setShowIosSteps] = useState(false);
+  const [showManualSteps, setShowManualSteps] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [platform, setPlatform] = useState<"ios" | "android" | null>(null);
 
   useEffect(() => {
     if (isStandalone()) return;
 
     if (isIos()) {
+      setPlatform("ios");
       setVisible(true);
       return;
     }
+
+    const android = isAndroid();
+    if (android) setPlatform("android");
 
     const onBeforeInstall = (e: Event) => {
       e.preventDefault();
@@ -51,9 +72,16 @@ export default function AdminInstallPrompt() {
 
     window.addEventListener("beforeinstallprompt", onBeforeInstall);
     window.addEventListener("appinstalled", onInstalled);
+
+    let fallbackTimer: ReturnType<typeof setTimeout> | null = null;
+    if (android) {
+      fallbackTimer = setTimeout(() => setVisible(true), ANDROID_FALLBACK_MS);
+    }
+
     return () => {
       window.removeEventListener("beforeinstallprompt", onBeforeInstall);
       window.removeEventListener("appinstalled", onInstalled);
+      if (fallbackTimer) clearTimeout(fallbackTimer);
     };
   }, []);
 
@@ -67,8 +95,9 @@ export default function AdminInstallPrompt() {
       setVisible(false);
       return;
     }
-    // iOS has no programmatic install — show the manual steps instead
-    setShowIosSteps(true);
+    // No native prompt available (iOS never has one; Android hasn't offered
+    // it yet) — show manual steps instead.
+    setShowManualSteps(true);
   };
 
   return (
@@ -85,14 +114,19 @@ export default function AdminInstallPrompt() {
             <p className="font-display text-sm font-bold uppercase tracking-wide text-white">
               Install MBT Admin
             </p>
-            {!showIosSteps ? (
+            {!showManualSteps ? (
               <p className="mt-0.5 text-xs text-white/50">
                 Add this to your home screen for one-tap access, like a real app.
               </p>
-            ) : (
+            ) : platform === "ios" ? (
               <p className="mt-1.5 flex items-center gap-1.5 text-xs text-white/60">
                 Tap <Share size={13} className="inline text-mbtYellow" /> then{" "}
                 <SquarePlus size={13} className="inline text-mbtYellow" /> &quot;Add to Home Screen&quot;
+              </p>
+            ) : (
+              <p className="mt-1.5 flex items-center gap-1.5 text-xs text-white/60">
+                Tap <MoreVertical size={13} className="inline text-mbtYellow" /> (top right) then
+                &quot;Install app&quot; or &quot;Add to Home screen&quot;
               </p>
             )}
           </div>
@@ -106,7 +140,7 @@ export default function AdminInstallPrompt() {
           </button>
         </div>
 
-        {!showIosSteps && (
+        {!showManualSteps && (
           <button
             type="button"
             onClick={handleInstall}
