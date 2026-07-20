@@ -257,7 +257,7 @@ export default function AdminLoginScreen() {
 
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-10 lg:border-none lg:bg-white lg:shadow-xl lg:shadow-black/5 lg:backdrop-blur-none">
             <h2 className="font-display text-2xl font-bold uppercase tracking-wide text-white lg:text-mbtDark">
-              Welcome back
+              Welcome back, Wasiullah
             </h2>
             <p className="mt-2 text-sm text-white/50 lg:text-mbtDark">
               Sign in with your admin email and password to manage the station.
