@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   BadgePercent,
   Bell,
+  BookOpen,
   Check,
   ChevronDown,
   ChevronUp,
@@ -47,6 +48,7 @@ import {
 } from "@/lib/actions";
 import { getStoragePhotoUrl } from "@/lib/storage-url";
 import { MASTER_PROMPT, PROMPT_CATEGORIES, TOTAL_PROMPTS, buildPrompt } from "@/lib/image-prompts";
+import AdminTutorialSection from "@/components/admin/AdminTutorialSection";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import type {
   CafeCategory,
@@ -122,6 +124,7 @@ function productStatusLabel(p: CafeProduct): string {
 
 type SectionId =
   | "overview"
+  | "tutorial"
   | "fuel"
   | "banner"
   | "cafe"
@@ -383,7 +386,7 @@ function Toggle({ on, onChange }: { on: boolean; onChange: () => void }) {
   );
 }
 
-function SectionCard({
+export function SectionCard({
   icon: Icon,
   title,
   subtitle,
@@ -442,6 +445,7 @@ interface Props {
 
 const NAV: { id: SectionId; label: string; icon: React.ComponentType<{ size?: number | string }> }[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "tutorial", label: "Tutorial", icon: BookOpen },
   { id: "fuel", label: "Fuel Prices", icon: Fuel },
   { id: "banner", label: "Status Banner", icon: AlertTriangle },
   { id: "cafe", label: "BUZZ Café", icon: Coffee },
@@ -972,6 +976,9 @@ export default function AdminDashboard(props: Props) {
               )}
             </div>
             )}
+
+            {/* ── Tutorial (own page only, not on Overview) ── */}
+            {section === "tutorial" && <AdminTutorialSection />}
 
             {/* ── Fuel prices ── */}
             {showSection("fuel") && !query && (
