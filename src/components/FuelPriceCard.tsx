@@ -7,6 +7,29 @@ const LABELS: Record<FuelPrice["fuel_type"], { kind: string; name: string }> = {
   diesel_10ppm: { kind: "Diesel", name: "10ppm" },
 };
 
+// Each fuel gets its own honest badge instead of a generic repeated label —
+// all four claims are plainly true for a 24-hour station and don't imply a
+// price comparison that isn't real (prices here are government-regulated,
+// not competitively set, so "cheapest"-style claims would be misleading).
+const BOTTOM_BADGE: Record<FuelPrice["fuel_type"], { label: string; className: string }> = {
+  petrol_95: {
+    label: "✓ Always In Stock",
+    className: "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+  },
+  petrol_93: {
+    label: "✓ Pump Ready 24/7",
+    className: "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+  },
+  diesel_50ppm: {
+    label: "★ Best Fleet Rate",
+    className: "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+  },
+  diesel_10ppm: {
+    label: "★ Best Grade Diesel",
+    className: "bg-mbtYellow text-mbtDark",
+  },
+};
+
 export default function FuelPriceCard({
   fuel,
   featured = false,
@@ -52,15 +75,11 @@ export default function FuelPriceCard({
       </p>
 
       <div>
-        {featured ? (
-          <span className="inline-block rounded bg-mbtYellow px-3 py-1.5 font-display text-[10px] font-bold uppercase tracking-widest text-mbtDark">
-            ★ Best Fleet Rate
-          </span>
-        ) : (
-          <span className="inline-block rounded border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 font-display text-[10px] font-bold uppercase tracking-widest text-emerald-400">
-            ✓ Official Locked
-          </span>
-        )}
+        <span
+          className={`inline-block rounded px-3 py-1.5 font-display text-[10px] font-bold uppercase tracking-widest ${BOTTOM_BADGE[fuel.fuel_type].className}`}
+        >
+          {BOTTOM_BADGE[fuel.fuel_type].label}
+        </span>
       </div>
     </div>
   );
