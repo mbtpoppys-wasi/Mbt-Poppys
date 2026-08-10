@@ -54,5 +54,6 @@ export function buildGasStationJsonLd(rating: PlaceRating | null) {
       name: "BUZZ Café",
       servesCuisine: "Convenience store food",
     },
+    sameAs: [siteConfig.social.facebook, siteConfig.social.instagram],
   };
 }

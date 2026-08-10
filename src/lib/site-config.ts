@@ -39,6 +39,11 @@ export const siteConfig = {
 
   googleReviewUrl: "https://g.page/r/CScuA4VrSljeEBM/review",
   googleWriteAReviewUrl: "https://g.page/r/CScuA4VrSljeEBM/review",
+
+  social: {
+    facebook: "https://www.facebook.com/share/18vBrkK4xY/",
+    instagram: "https://www.instagram.com/mbtpoppys_ventersdorp",
+  },
 };
 
 export type SiteConfig = typeof siteConfig;
